@@ -358,6 +358,47 @@
 
   .hidden { display: none !important; }
 
+  .part-heading {
+    margin: 18px 4px 8px;
+    font-size: 1rem;
+    color: var(--primary-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .paragraph-card {
+    border-radius: 18px;
+    background: linear-gradient(180deg, #fff5e3, #fff);
+  }
+  .paragraph-card:active { transform: translateY(2px); }
+  .paragraph-text {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    text-align: left;
+    margin: 8px 0 14px;
+  }
+  .sentence-btn {
+    display: inline;
+    border: none;
+    background: #fff1d6;
+    color: var(--text);
+    border-radius: 8px;
+    padding: 4px 8px;
+    margin: 2px;
+    font-size: 1.05rem;
+    font-family: inherit;
+    cursor: pointer;
+    line-height: 1.5;
+  }
+  .sentence-btn:active { background: var(--warn); color: #fff; }
+  .paragraph-answer {
+    font-size: 1.1rem;
+    text-align: left;
+    letter-spacing: normal;
+    line-height: 1.4;
+    resize: vertical;
+    min-height: 80px;
+  }
+
   @media (max-width: 380px) {
     .word-list { grid-template-columns: repeat(2, 1fr); }
     .dash-summary { grid-template-columns: repeat(5, 1fr); }
@@ -384,68 +425,106 @@
 
 /* ---------- SVG icons (inline, child-friendly) ---------- */
 const SVG = {
-  cat: `<svg viewBox="0 0 100 100"><circle cx="50" cy="58" r="30" fill="#f9b572"/><polygon points="25,40 30,15 45,32" fill="#f9b572"/><polygon points="75,40 70,15 55,32" fill="#f9b572"/><circle cx="40" cy="55" r="3" fill="#222"/><circle cx="60" cy="55" r="3" fill="#222"/><path d="M50 65 l-5 5 m5 -5 l5 5" stroke="#222" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M30 60 h-12 M30 65 h-15 M70 60 h12 M70 65 h15" stroke="#222" stroke-width="1.5" fill="none"/><polygon points="46,62 50,68 54,62" fill="#e8839a"/></svg>`,
-  dog: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="60" rx="28" ry="26" fill="#c98b50"/><ellipse cx="25" cy="45" rx="10" ry="18" fill="#a06a35" transform="rotate(-15 25 45)"/><ellipse cx="75" cy="45" rx="10" ry="18" fill="#a06a35" transform="rotate(15 75 45)"/><circle cx="40" cy="56" r="3" fill="#222"/><circle cx="60" cy="56" r="3" fill="#222"/><ellipse cx="50" cy="68" rx="6" ry="4" fill="#222"/><path d="M44 75 q6 6 12 0" stroke="#222" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
-  sun: `<svg viewBox="0 0 100 100"><g stroke="#ffb648" stroke-width="4" stroke-linecap="round"><line x1="50" y1="8" x2="50" y2="20"/><line x1="50" y1="80" x2="50" y2="92"/><line x1="8" y1="50" x2="20" y2="50"/><line x1="80" y1="50" x2="92" y2="50"/><line x1="20" y1="20" x2="28" y2="28"/><line x1="72" y1="72" x2="80" y2="80"/><line x1="80" y1="20" x2="72" y2="28"/><line x1="20" y1="80" x2="28" y2="72"/></g><circle cx="50" cy="50" r="22" fill="#ffd84d"/><circle cx="43" cy="46" r="2.5" fill="#222"/><circle cx="57" cy="46" r="2.5" fill="#222"/><path d="M42 56 q8 8 16 0" stroke="#222" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
-  moon: `<svg viewBox="0 0 100 100"><path d="M65 18 a36 36 0 1 0 0 64 a28 28 0 0 1 0 -64 z" fill="#ffe071"/><circle cx="48" cy="38" r="3" fill="#e2b945"/><circle cx="42" cy="55" r="2" fill="#e2b945"/><circle cx="55" cy="65" r="2.5" fill="#e2b945"/></svg>`,
-  tree: `<svg viewBox="0 0 100 100"><rect x="44" y="55" width="12" height="35" fill="#7a4f2b"/><circle cx="50" cy="40" r="28" fill="#5cb85c"/><circle cx="32" cy="50" r="14" fill="#6cc56c"/><circle cx="68" cy="50" r="14" fill="#6cc56c"/><circle cx="40" cy="30" r="3" fill="#e74c3c"/><circle cx="60" cy="35" r="3" fill="#e74c3c"/><circle cx="55" cy="22" r="3" fill="#e74c3c"/></svg>`,
-  fish: `<svg viewBox="0 0 100 100"><ellipse cx="48" cy="50" rx="30" ry="18" fill="#4ec3ff"/><polygon points="80,50 95,35 95,65" fill="#4ec3ff"/><circle cx="35" cy="46" r="3" fill="#222"/><circle cx="35" cy="46" r="1" fill="#fff"/><path d="M50 38 q5 5 0 10 q-5 5 0 10" stroke="#2196d6" stroke-width="2" fill="none"/><path d="M60 38 q5 5 0 10 q-5 5 0 10" stroke="#2196d6" stroke-width="2" fill="none"/></svg>`,
-  bird: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="22" ry="18" fill="#ff8a3d"/><circle cx="68" cy="42" r="12" fill="#ff8a3d"/><polygon points="78,42 92,40 78,46" fill="#ffb648"/><circle cx="70" cy="40" r="2" fill="#222"/><path d="M28 50 q-8 -10 -2 -16 q4 8 12 6 z" fill="#e76f1f"/><line x1="65" y1="73" x2="60" y2="88" stroke="#e76f1f" stroke-width="3" stroke-linecap="round"/><line x1="55" y1="73" x2="50" y2="88" stroke="#e76f1f" stroke-width="3" stroke-linecap="round"/></svg>`,
-  house: `<svg viewBox="0 0 100 100"><polygon points="50,15 15,45 85,45" fill="#e74c3c"/><rect x="22" y="45" width="56" height="40" fill="#fff1d6" stroke="#c98b50" stroke-width="2"/><rect x="42" y="58" width="16" height="27" fill="#7a4f2b"/><rect x="28" y="52" width="10" height="10" fill="#4ec3ff" stroke="#2196d6"/><rect x="62" y="52" width="10" height="10" fill="#4ec3ff" stroke="#2196d6"/></svg>`,
-  ball: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="34" fill="#ff8a3d"/><path d="M16 50 h68 M50 16 v68 M22 28 q28 22 56 44 M78 28 q-28 22 -56 44" stroke="#7a4f2b" stroke-width="2" fill="none"/></svg>`,
-  book: `<svg viewBox="0 0 100 100"><rect x="14" y="20" width="72" height="60" rx="3" fill="#4ec3ff"/><rect x="48" y="20" width="4" height="60" fill="#2196d6"/><line x1="22" y1="35" x2="44" y2="35" stroke="#fff" stroke-width="2"/><line x1="22" y1="45" x2="44" y2="45" stroke="#fff" stroke-width="2"/><line x1="22" y1="55" x2="44" y2="55" stroke="#fff" stroke-width="2"/><line x1="56" y1="35" x2="78" y2="35" stroke="#fff" stroke-width="2"/><line x1="56" y1="45" x2="78" y2="45" stroke="#fff" stroke-width="2"/><line x1="56" y1="55" x2="78" y2="55" stroke="#fff" stroke-width="2"/></svg>`,
-  apple: `<svg viewBox="0 0 100 100"><path d="M50 28 q-22 -2 -22 22 q0 24 22 32 q22 -8 22 -32 q0 -24 -22 -22 z" fill="#e74c3c"/><path d="M50 28 q-3 -10 6 -16" stroke="#5cb85c" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="58" cy="20" rx="6" ry="3" fill="#5cb85c" transform="rotate(30 58 20)"/></svg>`,
-  star: `<svg viewBox="0 0 100 100"><polygon points="50,10 61,38 92,40 67,58 76,88 50,70 24,88 33,58 8,40 39,38" fill="#ffd84d" stroke="#e2b945" stroke-width="2"/></svg>`,
-  flower: `<svg viewBox="0 0 100 100"><line x1="50" y1="55" x2="50" y2="92" stroke="#5cb85c" stroke-width="4"/><ellipse cx="35" cy="75" rx="8" ry="4" fill="#5cb85c" transform="rotate(-30 35 75)"/><circle cx="50" cy="35" r="12" fill="#ff8a3d"/><circle cx="35" cy="45" r="12" fill="#ff8a3d"/><circle cx="65" cy="45" r="12" fill="#ff8a3d"/><circle cx="40" cy="28" r="12" fill="#ff8a3d"/><circle cx="60" cy="28" r="12" fill="#ff8a3d"/><circle cx="50" cy="38" r="7" fill="#ffd84d"/></svg>`,
-  car: `<svg viewBox="0 0 100 100"><path d="M10 65 h80 v-12 l-12 -16 h-44 l-14 16 z" fill="#ef5350"/><rect x="36" y="40" width="14" height="14" fill="#cfeaff"/><rect x="52" y="40" width="20" height="14" fill="#cfeaff"/><circle cx="28" cy="72" r="9" fill="#222"/><circle cx="28" cy="72" r="4" fill="#888"/><circle cx="72" cy="72" r="9" fill="#222"/><circle cx="72" cy="72" r="4" fill="#888"/></svg>`,
-  cake: `<svg viewBox="0 0 100 100"><rect x="20" y="55" width="60" height="25" fill="#f9b572"/><path d="M20 55 q15 -8 30 0 q15 8 30 0 v8 q-15 8 -30 0 q-15 -8 -30 0 z" fill="#fff"/><rect x="48" y="35" width="4" height="18" fill="#ffd84d"/><path d="M50 30 q-3 5 0 8 q3 -3 0 -8 z" fill="#ff8a3d"/><circle cx="32" cy="68" r="3" fill="#e74c3c"/><circle cx="50" cy="74" r="3" fill="#4ec3ff"/><circle cx="68" cy="68" r="3" fill="#5cb85c"/></svg>`,
-  egg: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="25" ry="33" fill="#fff"/><ellipse cx="50" cy="55" rx="25" ry="33" fill="none" stroke="#e6dccb" stroke-width="2"/><ellipse cx="42" cy="46" rx="6" ry="3" fill="#fdf0d2"/></svg>`,
-  heart: `<svg viewBox="0 0 100 100"><path d="M50 82 C 18 60 18 30 36 26 C 44 24 50 30 50 36 C 50 30 56 24 64 26 C 82 30 82 60 50 82 Z" fill="#ef5350"/></svg>`,
-  cloud: `<svg viewBox="0 0 100 100"><ellipse cx="35" cy="60" rx="18" ry="14" fill="#fff"/><ellipse cx="55" cy="50" rx="22" ry="18" fill="#fff"/><ellipse cx="72" cy="62" rx="14" ry="12" fill="#fff"/><path d="M20 70 q 35 8 64 0" stroke="#cfeaff" stroke-width="2" fill="none"/></svg>`,
+  /* Part A */
+  camera: `<svg viewBox="0 0 100 100"><rect x="14" y="32" width="72" height="50" rx="6" fill="#444"/><rect x="36" y="22" width="22" height="14" fill="#444"/><circle cx="50" cy="58" r="18" fill="#222"/><circle cx="50" cy="58" r="13" fill="#4ec3ff"/><circle cx="50" cy="58" r="6" fill="#fff"/><circle cx="76" cy="44" r="3" fill="#ef5350"/><rect x="20" y="40" width="8" height="4" fill="#666"/></svg>`,
+  computer: `<svg viewBox="0 0 100 100"><rect x="10" y="18" width="80" height="54" rx="4" fill="#222"/><rect x="14" y="22" width="72" height="46" fill="#4ec3ff"/><rect x="20" y="28" width="44" height="6" fill="#fff" opacity="0.85"/><rect x="20" y="38" width="36" height="4" fill="#fff" opacity="0.6"/><rect x="20" y="46" width="40" height="4" fill="#fff" opacity="0.6"/><rect x="20" y="54" width="30" height="4" fill="#fff" opacity="0.6"/><rect x="40" y="74" width="20" height="6" fill="#666"/><rect x="28" y="80" width="44" height="6" fill="#444"/></svg>`,
+  phone: `<svg viewBox="0 0 100 100"><rect x="32" y="8" width="36" height="84" rx="6" fill="#222"/><rect x="36" y="18" width="28" height="60" fill="#4ec3ff"/><circle cx="50" cy="14" r="2" fill="#666"/><circle cx="50" cy="84" r="3" fill="#666"/><rect x="42" y="28" width="14" height="10" rx="2" fill="#fff" opacity="0.85"/><circle cx="44" cy="55" r="3" fill="#fff" opacity="0.85"/><circle cx="56" cy="55" r="3" fill="#fff" opacity="0.85"/><circle cx="44" cy="65" r="3" fill="#fff" opacity="0.85"/><circle cx="56" cy="65" r="3" fill="#fff" opacity="0.85"/></svg>`,
+  weekend: `<svg viewBox="0 0 100 100"><rect x="12" y="22" width="76" height="64" rx="4" fill="#fff" stroke="#444" stroke-width="2"/><rect x="12" y="22" width="76" height="16" fill="#ef5350"/><rect x="22" y="14" width="6" height="14" fill="#444"/><rect x="72" y="14" width="6" height="14" fill="#444"/><circle cx="32" cy="55" r="4" fill="#ddd"/><circle cx="50" cy="55" r="4" fill="#ddd"/><circle cx="68" cy="55" r="4" fill="#ddd"/><circle cx="32" cy="72" r="4" fill="#ddd"/><circle cx="50" cy="72" r="6" fill="#ffb648" stroke="#e76f1f" stroke-width="2"/><circle cx="68" cy="72" r="6" fill="#ffb648" stroke="#e76f1f" stroke-width="2"/></svg>`,
+  restaurant: `<svg viewBox="0 0 100 100"><rect x="10" y="36" width="80" height="50" fill="#fff1d6" stroke="#7a4f2b" stroke-width="2"/><polygon points="10,36 50,16 90,36" fill="#7a4f2b"/><rect x="14" y="36" width="72" height="10" fill="#ef5350"/><line x1="22" y1="36" x2="22" y2="46" stroke="#fff" stroke-width="2"/><line x1="34" y1="36" x2="34" y2="46" stroke="#fff" stroke-width="2"/><line x1="46" y1="36" x2="46" y2="46" stroke="#fff" stroke-width="2"/><line x1="58" y1="36" x2="58" y2="46" stroke="#fff" stroke-width="2"/><line x1="70" y1="36" x2="70" y2="46" stroke="#fff" stroke-width="2"/><rect x="44" y="58" width="12" height="28" fill="#7a4f2b"/><rect x="20" y="56" width="14" height="14" fill="#cfeaff" stroke="#7a4f2b"/><rect x="66" y="56" width="14" height="14" fill="#cfeaff" stroke="#7a4f2b"/></svg>`,
+  garden: `<svg viewBox="0 0 100 100"><rect x="6" y="62" width="88" height="28" fill="#7a4f2b"/><rect x="6" y="58" width="88" height="6" fill="#5cb85c"/><circle cx="22" cy="48" r="6" fill="#ef5350"/><line x1="22" y1="54" x2="22" y2="62" stroke="#3d7e3d" stroke-width="2"/><circle cx="40" cy="44" r="6" fill="#ffd84d"/><line x1="40" y1="50" x2="40" y2="62" stroke="#3d7e3d" stroke-width="2"/><circle cx="58" cy="48" r="6" fill="#ff8a3d"/><line x1="58" y1="54" x2="58" y2="62" stroke="#3d7e3d" stroke-width="2"/><circle cx="76" cy="44" r="6" fill="#9b59b6"/><line x1="76" y1="50" x2="76" y2="62" stroke="#3d7e3d" stroke-width="2"/><circle cx="50" cy="20" r="10" fill="#ffd84d"/></svg>`,
+  firefighter: `<svg viewBox="0 0 100 100"><circle cx="50" cy="36" r="12" fill="#f9b572"/><path d="M34 36 q16 -22 32 0 z" fill="#ef5350"/><rect x="40" y="34" width="20" height="6" fill="#444"/><rect x="48" y="20" width="4" height="6" fill="#ffd84d"/><rect x="32" y="48" width="36" height="38" rx="4" fill="#ffd84d"/><line x1="32" y1="56" x2="68" y2="56" stroke="#444" stroke-width="2"/><rect x="32" y="68" width="36" height="6" fill="#444"/><rect x="20" y="50" width="12" height="22" fill="#ffd84d"/><rect x="68" y="50" width="12" height="22" fill="#ffd84d"/></svg>`,
+  building: `<svg viewBox="0 0 100 100"><rect x="22" y="10" width="56" height="80" fill="#888"/><g fill="#cfeaff"><rect x="28" y="16" width="10" height="10"/><rect x="44" y="16" width="10" height="10"/><rect x="60" y="16" width="10" height="10"/><rect x="28" y="30" width="10" height="10"/><rect x="44" y="30" width="10" height="10"/><rect x="60" y="30" width="10" height="10"/><rect x="28" y="44" width="10" height="10"/><rect x="44" y="44" width="10" height="10"/><rect x="60" y="44" width="10" height="10"/><rect x="28" y="58" width="10" height="10"/><rect x="44" y="58" width="10" height="10"/><rect x="60" y="58" width="10" height="10"/></g><rect x="44" y="74" width="14" height="16" fill="#7a4f2b"/></svg>`,
+
+  /* Part B */
+  children: `<svg viewBox="0 0 100 100"><circle cx="28" cy="34" r="9" fill="#f9b572"/><rect x="18" y="44" width="20" height="28" rx="4" fill="#ef5350"/><rect x="20" y="72" width="6" height="12" fill="#222"/><rect x="30" y="72" width="6" height="12" fill="#222"/><circle cx="55" cy="40" r="8" fill="#c98b50"/><rect x="46" y="49" width="18" height="24" rx="4" fill="#5cb85c"/><rect x="48" y="73" width="5" height="11" fill="#222"/><rect x="57" y="73" width="5" height="11" fill="#222"/><circle cx="78" cy="36" r="9" fill="#f9b572"/><rect x="68" y="46" width="20" height="26" rx="4" fill="#4ec3ff"/><rect x="70" y="72" width="6" height="12" fill="#222"/><rect x="80" y="72" width="6" height="12" fill="#222"/></svg>`,
+  classroom: `<svg viewBox="0 0 100 100"><rect x="6" y="10" width="88" height="42" fill="#3d7e3d" stroke="#7a4f2b" stroke-width="2"/><line x1="14" y1="20" x2="34" y2="20" stroke="#fff" stroke-width="2"/><line x1="14" y1="28" x2="40" y2="28" stroke="#fff" stroke-width="2"/><line x1="50" y1="22" x2="60" y2="22" stroke="#fff" stroke-width="2"/><line x1="50" y1="30" x2="80" y2="30" stroke="#fff" stroke-width="2"/><line x1="14" y1="38" x2="50" y2="38" stroke="#fff" stroke-width="2"/><circle cx="20" cy="64" r="6" fill="#f9b572"/><rect x="14" y="70" width="12" height="14" fill="#4ec3ff"/><circle cx="50" cy="64" r="6" fill="#c98b50"/><rect x="44" y="70" width="12" height="14" fill="#ef5350"/><circle cx="80" cy="64" r="6" fill="#f9b572"/><rect x="74" y="70" width="12" height="14" fill="#5cb85c"/></svg>`,
+  tablets: `<svg viewBox="0 0 100 100"><rect x="14" y="12" width="72" height="76" rx="6" fill="#222"/><rect x="20" y="20" width="60" height="58" fill="#4ec3ff"/><circle cx="50" cy="84" r="3" fill="#666"/><rect x="28" y="30" width="44" height="8" fill="#fff"/><rect x="28" y="42" width="36" height="4" fill="#fff" opacity="0.7"/><rect x="28" y="50" width="40" height="4" fill="#fff" opacity="0.7"/><rect x="28" y="58" width="32" height="4" fill="#fff" opacity="0.7"/><rect x="28" y="66" width="38" height="4" fill="#fff" opacity="0.7"/></svg>`,
   friend: `<svg viewBox="0 0 100 100"><circle cx="35" cy="35" r="11" fill="#f9b572"/><rect x="22" y="48" width="26" height="34" rx="6" fill="#4ec3ff"/><circle cx="65" cy="35" r="11" fill="#c98b50"/><rect x="52" y="48" width="26" height="34" rx="6" fill="#ff8a3d"/><path d="M40 60 q10 -8 20 0" stroke="#222" stroke-width="2" fill="none"/></svg>`,
   school: `<svg viewBox="0 0 100 100"><rect x="14" y="40" width="72" height="46" fill="#ef5350"/><polygon points="14,40 50,18 86,40" fill="#7a4f2b"/><rect x="44" y="55" width="12" height="31" fill="#7a4f2b"/><rect x="22" y="50" width="10" height="10" fill="#cfeaff"/><rect x="68" y="50" width="10" height="10" fill="#cfeaff"/><line x1="50" y1="18" x2="50" y2="6" stroke="#222" stroke-width="2"/><polygon points="50,6 64,10 50,14" fill="#5cb85c"/></svg>`,
-  happy: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#ffd84d" stroke="#e2b945" stroke-width="2"/><circle cx="38" cy="42" r="4" fill="#222"/><circle cx="62" cy="42" r="4" fill="#222"/><path d="M30 58 q20 22 40 0" stroke="#222" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
-  water: `<svg viewBox="0 0 100 100"><path d="M50 12 C 30 40 22 56 22 68 a 28 28 0 0 0 56 0 c 0 -12 -8 -28 -28 -56 z" fill="#4ec3ff"/><ellipse cx="40" cy="60" rx="6" ry="10" fill="#fff" opacity="0.5"/></svg>`,
-  children: `<svg viewBox="0 0 100 100"><circle cx="28" cy="34" r="9" fill="#f9b572"/><rect x="18" y="44" width="20" height="28" rx="4" fill="#ef5350"/><rect x="20" y="72" width="6" height="12" fill="#222"/><rect x="30" y="72" width="6" height="12" fill="#222"/><circle cx="55" cy="40" r="8" fill="#c98b50"/><rect x="46" y="49" width="18" height="24" rx="4" fill="#5cb85c"/><rect x="48" y="73" width="5" height="11" fill="#222"/><rect x="57" y="73" width="5" height="11" fill="#222"/><circle cx="78" cy="36" r="9" fill="#f9b572"/><rect x="68" y="46" width="20" height="26" rx="4" fill="#4ec3ff"/><rect x="70" y="72" width="6" height="12" fill="#222"/><rect x="80" y="72" width="6" height="12" fill="#222"/></svg>`,
-  teacher: `<svg viewBox="0 0 100 100"><circle cx="40" cy="30" r="11" fill="#f9b572"/><rect x="28" y="42" width="24" height="34" rx="5" fill="#4ec3ff"/><rect x="30" y="76" width="9" height="14" fill="#222"/><rect x="41" y="76" width="9" height="14" fill="#222"/><rect x="60" y="22" width="32" height="40" fill="#fff" stroke="#7a4f2b" stroke-width="2"/><line x1="64" y1="32" x2="88" y2="32" stroke="#222" stroke-width="2"/><line x1="64" y1="40" x2="84" y2="40" stroke="#222" stroke-width="2"/><line x1="64" y1="48" x2="80" y2="48" stroke="#222" stroke-width="2"/><line x1="52" y1="48" x2="62" y2="42" stroke="#7a4f2b" stroke-width="3" stroke-linecap="round"/></svg>`,
-  pencil: `<svg viewBox="0 0 100 100"><polygon points="14,80 30,76 80,26 76,12 22,68" fill="#ffd84d" stroke="#e2b945" stroke-width="1.5"/><polygon points="80,26 88,18 76,12" fill="#ef5350"/><polygon points="14,80 22,68 30,76" fill="#222"/><line x1="22" y1="68" x2="76" y2="14" stroke="#e2b945" stroke-width="1"/></svg>`,
-  bus: `<svg viewBox="0 0 100 100"><rect x="14" y="32" width="72" height="40" rx="6" fill="#ffd84d"/><rect x="20" y="38" width="14" height="14" fill="#cfeaff"/><rect x="38" y="38" width="14" height="14" fill="#cfeaff"/><rect x="56" y="38" width="14" height="14" fill="#cfeaff"/><rect x="74" y="40" width="8" height="10" fill="#cfeaff"/><circle cx="30" cy="76" r="8" fill="#222"/><circle cx="70" cy="76" r="8" fill="#222"/><circle cx="30" cy="76" r="3" fill="#888"/><circle cx="70" cy="76" r="3" fill="#888"/><rect x="14" y="68" width="72" height="4" fill="#7a4f2b"/></svg>`,
-  shoe: `<svg viewBox="0 0 100 100"><path d="M10 65 q0 -8 6 -10 l24 -6 q6 -2 14 4 l16 12 q4 2 12 4 q12 2 12 12 v6 h-84 z" fill="#ef5350"/><line x1="30" y1="60" x2="34" y2="68" stroke="#fff" stroke-width="2"/><line x1="40" y1="58" x2="44" y2="66" stroke="#fff" stroke-width="2"/><line x1="50" y1="58" x2="54" y2="66" stroke="#fff" stroke-width="2"/><rect x="10" y="78" width="84" height="6" fill="#222"/></svg>`,
+  tennis: `<svg viewBox="0 0 100 100"><line x1="20" y1="20" x2="44" y2="44" stroke="#7a4f2b" stroke-width="6" stroke-linecap="round"/><g transform="rotate(-45 36 36)"><ellipse cx="36" cy="36" rx="14" ry="11" fill="#fff" stroke="#7a4f2b" stroke-width="2"/><line x1="22" y1="36" x2="50" y2="36" stroke="#aaa" stroke-width="0.8"/><line x1="22" y1="32" x2="50" y2="32" stroke="#aaa" stroke-width="0.8"/><line x1="22" y1="40" x2="50" y2="40" stroke="#aaa" stroke-width="0.8"/><line x1="36" y1="25" x2="36" y2="47" stroke="#aaa" stroke-width="0.8"/><line x1="32" y1="25" x2="32" y2="47" stroke="#aaa" stroke-width="0.8"/><line x1="40" y1="25" x2="40" y2="47" stroke="#aaa" stroke-width="0.8"/></g><circle cx="68" cy="68" r="14" fill="#dfee5e" stroke="#aaa" stroke-width="2"/><path d="M56 60 q12 6 24 -8 m-26 24 q14 -8 26 6" stroke="#fff" stroke-width="1.5" fill="none"/></svg>`,
+  football: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="34" fill="#fff" stroke="#222" stroke-width="2"/><polygon points="50,32 62,42 58,56 42,56 38,42" fill="#222"/><polygon points="36,28 26,42 32,52 38,42" fill="#222"/><polygon points="64,28 74,42 68,52 62,42" fill="#222"/><polygon points="42,60 50,72 58,60" fill="#222"/><line x1="50" y1="32" x2="50" y2="20" stroke="#222"/><line x1="62" y1="42" x2="74" y2="38" stroke="#222"/><line x1="38" y1="42" x2="26" y2="38" stroke="#222"/></svg>`,
+  listen: `<svg viewBox="0 0 100 100"><path d="M50 20 q-22 -2 -22 24 q0 8 4 14 q4 5 4 12 q0 8 8 8 q6 0 6 -7 q0 -7 4 -10 q14 -3 18 -16 q3 -27 -22 -25 z" fill="#f9b572"/><path d="M50 36 q-8 0 -8 12 q4 0 6 6" stroke="#7a4f2b" stroke-width="2" fill="none"/><g stroke="#4ec3ff" stroke-width="2.5" fill="none" stroke-linecap="round"><path d="M76 36 q4 6 0 16"/><path d="M82 30 q8 12 0 28"/><path d="M88 26 q12 16 0 36"/></g></svg>`,
+
+  /* Part C: Downtown */
+  parkingGarage: `<svg viewBox="0 0 100 100"><rect x="14" y="22" width="72" height="64" fill="#888"/><rect x="14" y="22" width="72" height="14" fill="#222"/><circle cx="50" cy="29" r="6" fill="#fff"/><text x="50" y="33" text-anchor="middle" font-size="11" font-weight="bold" fill="#222" font-family="sans-serif">P</text><line x1="14" y1="48" x2="86" y2="48" stroke="#444"/><line x1="14" y1="62" x2="86" y2="62" stroke="#444"/><line x1="14" y1="76" x2="86" y2="76" stroke="#444"/><rect x="20" y="52" width="14" height="6" fill="#ef5350"/><rect x="40" y="52" width="14" height="6" fill="#4ec3ff"/><rect x="60" y="52" width="14" height="6" fill="#ffd84d"/><rect x="20" y="66" width="14" height="6" fill="#5cb85c"/><rect x="40" y="66" width="14" height="6" fill="#9b59b6"/><rect x="60" y="66" width="14" height="6" fill="#ef5350"/></svg>`,
+  officeBuilding: `<svg viewBox="0 0 100 100"><rect x="20" y="10" width="60" height="80" fill="#9c8870"/><g fill="#cfeaff"><rect x="26" y="16" width="14" height="8"/><rect x="44" y="16" width="14" height="8"/><rect x="62" y="16" width="14" height="8"/><rect x="26" y="28" width="14" height="8"/><rect x="44" y="28" width="14" height="8"/><rect x="62" y="28" width="14" height="8"/><rect x="26" y="40" width="14" height="8"/><rect x="44" y="40" width="14" height="8"/><rect x="62" y="40" width="14" height="8"/><rect x="26" y="52" width="14" height="8"/><rect x="44" y="52" width="14" height="8"/><rect x="62" y="52" width="14" height="8"/><rect x="26" y="64" width="14" height="8"/><rect x="44" y="64" width="14" height="8"/><rect x="62" y="64" width="14" height="8"/></g><rect x="44" y="76" width="12" height="14" fill="#444"/></svg>`,
+  hotel: `<svg viewBox="0 0 100 100"><rect x="14" y="20" width="72" height="68" fill="#ef5350"/><rect x="14" y="20" width="72" height="14" fill="#222"/><text x="50" y="32" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffd84d" font-family="sans-serif">HOTEL</text><g fill="#cfeaff"><rect x="22" y="40" width="12" height="10"/><rect x="44" y="40" width="12" height="10"/><rect x="66" y="40" width="12" height="10"/><rect x="22" y="56" width="12" height="10"/><rect x="44" y="56" width="12" height="10"/><rect x="66" y="56" width="12" height="10"/></g><rect x="42" y="74" width="16" height="14" fill="#7a4f2b"/><circle cx="46" cy="82" r="1.5" fill="#ffd84d"/></svg>`,
+  dmv: `<svg viewBox="0 0 100 100"><rect x="10" y="40" width="80" height="48" fill="#cfeaff" stroke="#888" stroke-width="2"/><polygon points="10,40 50,18 90,40" fill="#888"/><rect x="14" y="38" width="72" height="6" fill="#444"/><rect x="20" y="50" width="10" height="36" fill="#fff" stroke="#888"/><rect x="36" y="50" width="10" height="36" fill="#fff" stroke="#888"/><rect x="52" y="50" width="10" height="36" fill="#fff" stroke="#888"/><rect x="68" y="50" width="10" height="36" fill="#fff" stroke="#888"/><text x="50" y="34" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff" font-family="sans-serif">DMV</text></svg>`,
+  bank: `<svg viewBox="0 0 100 100"><rect x="10" y="20" width="80" height="68" fill="#9c8870"/><rect x="10" y="20" width="80" height="10" fill="#7a4f2b"/><text x="50" y="28" text-anchor="middle" font-size="8" font-weight="bold" fill="#ffd84d" font-family="sans-serif">BANK</text><rect x="36" y="42" width="28" height="46" rx="2" fill="#444"/><circle cx="50" cy="64" r="9" fill="#888" stroke="#222" stroke-width="2"/><circle cx="50" cy="64" r="3" fill="#222"/><line x1="50" y1="55" x2="50" y2="73" stroke="#222"/><line x1="41" y1="64" x2="59" y2="64" stroke="#222"/><line x1="44" y1="58" x2="56" y2="70" stroke="#222"/><line x1="56" y1="58" x2="44" y2="70" stroke="#222"/></svg>`,
+  policeStation: `<svg viewBox="0 0 100 100"><rect x="10" y="30" width="80" height="58" fill="#4ec3ff"/><rect x="10" y="30" width="80" height="14" fill="#2196d6"/><text x="50" y="40" text-anchor="middle" font-size="9" font-weight="bold" fill="#fff" font-family="sans-serif">POLICE</text><g fill="#cfeaff"><rect x="20" y="50" width="14" height="14"/><rect x="66" y="50" width="14" height="14"/></g><rect x="42" y="62" width="16" height="26" fill="#7a4f2b"/><polygon points="50,72 56,76 54,82 46,82 44,76" fill="#ffd84d"/></svg>`,
+  busStation: `<svg viewBox="0 0 100 100"><rect x="14" y="34" width="72" height="40" rx="6" fill="#ffd84d"/><rect x="20" y="40" width="14" height="14" fill="#cfeaff"/><rect x="38" y="40" width="14" height="14" fill="#cfeaff"/><rect x="56" y="40" width="14" height="14" fill="#cfeaff"/><rect x="74" y="42" width="8" height="10" fill="#cfeaff"/><circle cx="30" cy="78" r="8" fill="#222"/><circle cx="70" cy="78" r="8" fill="#222"/><circle cx="30" cy="78" r="3" fill="#888"/><circle cx="70" cy="78" r="3" fill="#888"/><rect x="14" y="70" width="72" height="4" fill="#7a4f2b"/><rect x="6" y="14" width="14" height="14" fill="#4ec3ff"/><text x="13" y="25" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff" font-family="sans-serif">B</text></svg>`,
+  cityHall: `<svg viewBox="0 0 100 100"><rect x="14" y="44" width="72" height="44" fill="#cfeaff" stroke="#888" stroke-width="2"/><rect x="14" y="44" width="72" height="6" fill="#444"/><polygon points="14,44 50,28 86,44" fill="#888"/><path d="M30 28 q20 -22 40 0 z" fill="#9c8870"/><line x1="50" y1="6" x2="50" y2="14" stroke="#222"/><polygon points="50,6 60,8 50,11" fill="#ef5350"/><g fill="#fff" stroke="#888"><rect x="22" y="54" width="8" height="20"/><rect x="36" y="54" width="8" height="20"/><rect x="56" y="54" width="8" height="20"/><rect x="70" y="54" width="8" height="20"/></g><rect x="46" y="74" width="8" height="14" fill="#7a4f2b"/></svg>`,
+  hospital: `<svg viewBox="0 0 100 100"><rect x="14" y="22" width="72" height="66" fill="#fff" stroke="#888" stroke-width="2"/><rect x="14" y="22" width="72" height="10" fill="#ef5350"/><rect x="46" y="36" width="8" height="20" fill="#ef5350"/><rect x="40" y="42" width="20" height="8" fill="#ef5350"/><g fill="#cfeaff"><rect x="20" y="60" width="12" height="10"/><rect x="38" y="60" width="12" height="10"/><rect x="68" y="60" width="12" height="10"/><rect x="20" y="74" width="12" height="10"/><rect x="38" y="74" width="12" height="10"/><rect x="68" y="74" width="12" height="10"/></g><rect x="56" y="74" width="6" height="14" fill="#7a4f2b"/></svg>`,
+  gasStation: `<svg viewBox="0 0 100 100"><rect x="30" y="20" width="36" height="60" rx="3" fill="#ef5350"/><rect x="36" y="28" width="24" height="14" fill="#222"/><circle cx="44" cy="35" r="2" fill="#dfee5e"/><circle cx="56" cy="35" r="2" fill="#dfee5e"/><rect x="38" y="50" width="20" height="22" fill="#fff" stroke="#222"/><rect x="42" y="55" width="12" height="3" fill="#222"/><rect x="42" y="62" width="12" height="3" fill="#222"/><path d="M66 40 q8 0 8 8 v22 h6 v-22 q0 -16 -14 -16" fill="#888"/><rect x="30" y="80" width="36" height="6" fill="#444"/></svg>`,
+  postOffice: `<svg viewBox="0 0 100 100"><rect x="10" y="32" width="80" height="56" fill="#fff1d6" stroke="#7a4f2b" stroke-width="2"/><rect x="10" y="32" width="80" height="10" fill="#4ec3ff"/><text x="50" y="40" text-anchor="middle" font-size="7" font-weight="bold" fill="#fff" font-family="sans-serif">POST</text><rect x="32" y="50" width="36" height="22" fill="#fff" stroke="#222"/><polygon points="32,50 50,64 68,50" fill="none" stroke="#222" stroke-width="1.5"/><rect x="48" y="74" width="4" height="14" fill="#7a4f2b"/><rect x="20" y="74" width="14" height="14" fill="#cfeaff" stroke="#7a4f2b"/><rect x="66" y="74" width="14" height="14" fill="#cfeaff" stroke="#7a4f2b"/></svg>`,
+  fireStation: `<svg viewBox="0 0 100 100"><rect x="6" y="34" width="88" height="54" fill="#ef5350"/><rect x="6" y="34" width="88" height="10" fill="#222"/><text x="50" y="42" text-anchor="middle" font-size="8" font-weight="bold" fill="#ffd84d" font-family="sans-serif">FIRE</text><rect x="14" y="48" width="32" height="40" fill="#222"/><rect x="18" y="52" width="24" height="32" fill="#fff" stroke="#888"/><line x1="30" y1="52" x2="30" y2="84" stroke="#888"/><rect x="56" y="52" width="32" height="20" fill="#cfeaff" stroke="#888"/><circle cx="64" cy="78" r="5" fill="#444"/><circle cx="80" cy="78" r="5" fill="#444"/></svg>`,
+  courthouse: `<svg viewBox="0 0 100 100"><polygon points="6,40 50,20 94,40" fill="#cfeaff" stroke="#888" stroke-width="2"/><rect x="6" y="40" width="88" height="6" fill="#444"/><g fill="#fff" stroke="#888" stroke-width="1"><rect x="14" y="46" width="8" height="34"/><rect x="28" y="46" width="8" height="34"/><rect x="42" y="46" width="8" height="34"/><rect x="56" y="46" width="8" height="34"/><rect x="70" y="46" width="8" height="34"/></g><rect x="6" y="80" width="88" height="6" fill="#444"/><rect x="6" y="86" width="88" height="4" fill="#888"/><g stroke="#ffd84d" stroke-width="2" fill="none"><line x1="50" y1="24" x2="50" y2="38"/><line x1="42" y1="28" x2="58" y2="28"/></g><circle cx="42" cy="34" r="2" fill="#ffd84d"/><circle cx="58" cy="34" r="2" fill="#ffd84d"/></svg>`,
+  library: `<svg viewBox="0 0 100 100"><rect x="10" y="22" width="80" height="64" fill="#9c8870" stroke="#7a4f2b" stroke-width="2"/><rect x="10" y="22" width="80" height="10" fill="#7a4f2b"/><text x="50" y="30" text-anchor="middle" font-size="7" font-weight="bold" fill="#ffd84d" font-family="sans-serif">LIBRARY</text><g><rect x="18" y="40" width="6" height="22" fill="#ef5350"/><rect x="26" y="40" width="6" height="22" fill="#4ec3ff"/><rect x="34" y="40" width="6" height="22" fill="#5cb85c"/><rect x="42" y="42" width="6" height="20" fill="#ffd84d"/><rect x="50" y="40" width="6" height="22" fill="#9b59b6"/><rect x="58" y="42" width="6" height="20" fill="#ef5350"/><rect x="66" y="40" width="6" height="22" fill="#4ec3ff"/><rect x="74" y="42" width="6" height="20" fill="#ffd84d"/></g><g><rect x="18" y="66" width="6" height="20" fill="#5cb85c"/><rect x="26" y="66" width="6" height="20" fill="#ef5350"/><rect x="34" y="68" width="6" height="18" fill="#4ec3ff"/><rect x="42" y="66" width="6" height="20" fill="#ffd84d"/><rect x="50" y="68" width="6" height="18" fill="#9b59b6"/><rect x="58" y="66" width="6" height="20" fill="#5cb85c"/><rect x="66" y="68" width="6" height="18" fill="#4ec3ff"/><rect x="74" y="66" width="6" height="20" fill="#ef5350"/></g></svg>`,
+
+  /* paragraph icon (kids reading at desks) */
+  paragraph: `<svg viewBox="0 0 100 100"><rect x="6" y="14" width="88" height="50" fill="#fff" stroke="#7a4f2b" stroke-width="2"/><line x1="14" y1="24" x2="80" y2="24" stroke="#222" stroke-width="2"/><line x1="14" y1="32" x2="74" y2="32" stroke="#222" stroke-width="2"/><line x1="14" y1="40" x2="78" y2="40" stroke="#222" stroke-width="2"/><line x1="14" y1="48" x2="60" y2="48" stroke="#222" stroke-width="2"/><circle cx="22" cy="76" r="6" fill="#f9b572"/><rect x="16" y="82" width="12" height="10" fill="#4ec3ff"/><circle cx="50" cy="76" r="6" fill="#c98b50"/><rect x="44" y="82" width="12" height="10" fill="#ef5350"/><circle cx="78" cy="76" r="6" fill="#f9b572"/><rect x="72" y="82" width="12" height="10" fill="#5cb85c"/></svg>`,
 };
 
-/* ---------- Word data ---------- */
+/* ---------- Word data: Dictation 5 (Academy Stars Unit 3 & 4) ---------- */
 const WORDS = [
-  { word: "cat", sentence: "The ___ sat on the mat.", icon: "cat" },
-  { word: "dog", sentence: "My ___ likes to play.", icon: "dog" },
-  { word: "sun", sentence: "The ___ is bright today.", icon: "sun" },
-  { word: "moon", sentence: "The ___ shines at night.", icon: "moon" },
-  { word: "tree", sentence: "The ___ has green leaves.", icon: "tree" },
-  { word: "fish", sentence: "A ___ swims in the sea.", icon: "fish" },
-  { word: "bird", sentence: "A ___ can fly high.", icon: "bird" },
-  { word: "house", sentence: "I live in a red ___.", icon: "house" },
-  { word: "ball", sentence: "I kick the ___ to my friend.", icon: "ball" },
-  { word: "book", sentence: "I read a ___ at bed time.", icon: "book" },
-  { word: "apple", sentence: "I eat a juicy ___.", icon: "apple" },
-  { word: "star", sentence: "Each ___ shines so bright.", icon: "star" },
-  { word: "flower", sentence: "The ___ smells nice.", icon: "flower" },
-  { word: "car", sentence: "Dad drives a fast ___.", icon: "car" },
-  { word: "cake", sentence: "We ate the birthday ___.", icon: "cake" },
-  { word: "egg", sentence: "I had an ___ for breakfast.", icon: "egg" },
-  { word: "heart", sentence: "I love mum with all my ___.", icon: "heart" },
-  { word: "cloud", sentence: "A fluffy ___ is in the sky.", icon: "cloud" },
-  { word: "friend", sentence: "My best ___ makes me laugh.", icon: "friend" },
-  { word: "school", sentence: "I learn things at ___.", icon: "school" },
-  { word: "happy", sentence: "I feel so ___ today.", icon: "happy" },
-  { word: "water", sentence: "I drink cold ___.", icon: "water" },
-  { word: "children", sentence: "The ___ play in the park.", icon: "children" },
-  { word: "teacher", sentence: "My ___ helps me read.", icon: "teacher" },
-  { word: "pencil", sentence: "I write with my ___.", icon: "pencil" },
-  { word: "bus", sentence: "I ride the yellow ___.", icon: "bus" },
-  { word: "shoe", sentence: "I tie my ___ on my foot.", icon: "shoe" },
+  /* Part A: Key Vocabulary */
+  { word: "camera", sentence: "I take photos with a ___.", icon: "camera", part: "A" },
+  { word: "computer", sentence: "I use a ___ at school.", icon: "computer", part: "A" },
+  { word: "phone", sentence: "Mum talks on her ___.", icon: "phone", part: "A" },
+  { word: "weekend", sentence: "I have fun on the ___.", icon: "weekend", part: "A" },
+  { word: "restaurant", sentence: "We eat at a ___.", icon: "restaurant", part: "A" },
+  { word: "garden", sentence: "Flowers grow in the ___.", icon: "garden", part: "A" },
+  { word: "firefighter", sentence: "A ___ helps in a fire.", icon: "firefighter", part: "A" },
+  { word: "building", sentence: "That ___ is very tall.", icon: "building", part: "A" },
+
+  /* Part B: Words from the paragraph */
+  { word: "children", sentence: "The ___ use tablets in the classroom.", icon: "children", part: "B" },
+  { word: "classroom", sentence: "We learn in our ___.", icon: "classroom", part: "B" },
+  { word: "tablets", sentence: "We read on the ___.", icon: "tablets", part: "B" },
+  { word: "school", sentence: "I go to ___ every day.", icon: "school", part: "B" },
+  { word: "friend", sentence: "Eva is my ___.", icon: "friend", part: "B" },
+  { word: "tennis", sentence: "She plays ___ on Sunday.", icon: "tennis", part: "B" },
+  { word: "football", sentence: "She doesn't play ___.", icon: "football", part: "B" },
+  { word: "listen", sentence: "We ___ to the teacher.", icon: "listen", part: "B" },
+
+  /* Part C: Downtown (bonus) */
+  { word: "parking garage", sentence: "Cars park in the ___.", icon: "parkingGarage", part: "C" },
+  { word: "office building", sentence: "Mum works in the ___.", icon: "officeBuilding", part: "C" },
+  { word: "hotel", sentence: "We sleep in the ___.", icon: "hotel", part: "C" },
+  { word: "Department of Motor Vehicles", sentence: "Adults get a licence at the ___.", icon: "dmv", part: "C" },
+  { word: "bank", sentence: "We keep money in the ___.", icon: "bank", part: "C" },
+  { word: "police station", sentence: "Police work at the ___.", icon: "policeStation", part: "C" },
+  { word: "bus station", sentence: "Buses stop at the ___.", icon: "busStation", part: "C" },
+  { word: "city hall", sentence: "The mayor works at the ___.", icon: "cityHall", part: "C" },
+  { word: "hospital", sentence: "Doctors work in the ___.", icon: "hospital", part: "C" },
+  { word: "gas station", sentence: "Cars get fuel at the ___.", icon: "gasStation", part: "C" },
+  { word: "post office", sentence: "We send letters at the ___.", icon: "postOffice", part: "C" },
+  { word: "fire station", sentence: "Fire trucks live at the ___.", icon: "fireStation", part: "C" },
+  { word: "courthouse", sentence: "Judges work at the ___.", icon: "courthouse", part: "C" },
+  { word: "library", sentence: "We borrow books at the ___.", icon: "library", part: "C" },
 ];
 
+/* The Part B paragraph the child must write */
+const PARAGRAPH = {
+  title: "Part B Paragraph",
+  sentences: [
+    "In some schools, children use tablets in the classroom.",
+    "They read, write and listen with them.",
+    "This is my friend Eva.",
+    "She goes to my school.",
+    "She plays tennis.",
+    "She doesn't play football.",
+  ],
+};
+
+const PART_LABELS = {
+  A: "Part A — Key Vocabulary",
+  B: "Part B — Paragraph Words",
+  C: "Part C — Downtown (Bonus)",
+};
+
 /* ---------- State ---------- */
-const STORAGE_KEY = "spelling-star-v1";
+const STORAGE_KEY = "spelling-star-v2";
 const MODES = ["learn", "copy", "guided", "dictation"];
 const MODE_LABELS = {
   learn: "Learn",
@@ -519,14 +598,15 @@ function speak(text) {
 
 /* ---------- Helpers ---------- */
 function findWord(word) { return WORDS.find(w => w.word === word); }
-function normalize(s) { return (s || "").trim().toLowerCase(); }
+function normalize(s) { return (s || "").trim().toLowerCase().replace(/\s+/g, " "); }
 
 function blankWord(word) {
   const vowels = "aeiou";
   const chars = word.split("");
   const positions = [];
   for (let i = 0; i < chars.length; i++) {
-    if (vowels.includes(chars[i].toLowerCase())) positions.push(i);
+    const ch = chars[i].toLowerCase();
+    if (vowels.includes(ch)) positions.push(i);
   }
   // Decide how many vowels to blank
   let toBlank;
@@ -539,12 +619,14 @@ function blankWord(word) {
   if (pool.length > toBlank && pool[0] === 0) pool = pool.slice(1);
   const blanks = pool.slice(0, toBlank);
 
-  // For longer words, also blank one consonant in the middle
-  if (word.length >= 7) {
+  // For longer single words, also blank one consonant in the middle
+  if (word.length >= 7 && !word.includes(" ")) {
     const mid = Math.floor(word.length / 2);
     for (let off = 0; off < 4; off++) {
       const idx = mid + off;
-      if (idx > 0 && idx < word.length - 1 && !blanks.includes(idx) && !vowels.includes(chars[idx].toLowerCase())) {
+      const ch = chars[idx] && chars[idx].toLowerCase();
+      if (idx > 0 && idx < word.length - 1 && !blanks.includes(idx)
+          && ch && !vowels.includes(ch) && /[a-z]/.test(ch)) {
         blanks.push(idx);
         break;
       }
@@ -575,6 +657,10 @@ function filteredWords() {
   }
   if (state.filter === "mastered") {
     return WORDS.filter(w => levelOf(getP(w.word)) === 4);
+  }
+  if (state.filter && state.filter.startsWith("part:")) {
+    const p = state.filter.slice(5);
+    return WORDS.filter(w => w.part === p);
   }
   return WORDS.slice();
 }
@@ -681,6 +767,7 @@ const main = document.getElementById("main");
 
 function render() {
   if (state.view === "dashboard") renderDashboard();
+  else if (state.view === "paragraph") renderParagraph();
   else renderWord();
 }
 
@@ -689,9 +776,21 @@ function renderDashboard() {
   for (const w of WORDS) counts[levelOf(getP(w.word))]++;
 
   const list = filteredWords();
+  const parts = ["A", "B", "C"];
+  const grouped = parts.map(p => ({
+    part: p,
+    label: PART_LABELS[p],
+    items: list.filter(w => w.part === p),
+  })).filter(g => g.items.length > 0);
+
+  const partFilterChip = (p) => `
+    <button class="chip ${state.filter==='part:'+p?'active':''}" data-f="part:${p}">Part ${p}</button>
+  `;
+
   main.innerHTML = `
     <div class="filter-bar">
-      <button class="chip ${state.filter==='all'?'active':''}" data-f="all">All Words (${WORDS.length})</button>
+      <button class="chip ${state.filter==='all'?'active':''}" data-f="all">All (${WORDS.length})</button>
+      ${parts.map(partFilterChip).join("")}
       <button class="chip ${state.filter==='practice'?'active':''}" data-f="practice">Need Practice</button>
       <button class="chip ${state.filter==='mastered'?'active':''}" data-f="mastered">Mastered</button>
     </div>
@@ -710,9 +809,23 @@ function renderDashboard() {
       <button class="btn good" id="dailyStart">Start Daily 10</button>
     </div>
 
-    <div class="word-list" id="wordList">
-      ${list.map(w => wordTileHTML(w.word)).join("") || `<div class="card" style="grid-column:1/-1;text-align:center;color:var(--muted);">No words match this filter yet.</div>`}
-    </div>
+    <button class="card paragraph-card" id="paragraphCard" style="text-align:left;display:flex;gap:14px;align-items:center;width:100%;border:2px solid var(--border);cursor:pointer;font-family:inherit;">
+      <div style="flex:0 0 64px;">${SVG.paragraph}</div>
+      <div style="flex:1;">
+        <div style="font-weight:800;font-size:1.05rem;">📖 Part B Paragraph</div>
+        <div style="color:var(--muted);font-size:0.85rem;margin-top:2px;">Hear it, then write each sentence</div>
+      </div>
+      <div style="font-size:1.4rem;color:var(--primary-dark);">▶</div>
+    </button>
+
+    ${grouped.length === 0
+      ? `<div class="card" style="text-align:center;color:var(--muted);">No words match this filter yet.</div>`
+      : grouped.map(g => `
+          <h3 class="part-heading">${g.label}</h3>
+          <div class="word-list">
+            ${g.items.map(w => wordTileHTML(w.word)).join("")}
+          </div>
+        `).join("")}
   `;
 
   document.querySelectorAll(".chip[data-f]").forEach(b => {
@@ -723,6 +836,8 @@ function renderDashboard() {
   });
   const ds = document.getElementById("dailyStart");
   if (ds) ds.addEventListener("click", startDaily);
+  const pc = document.getElementById("paragraphCard");
+  if (pc) pc.addEventListener("click", openParagraph);
   document.querySelectorAll(".word-tile").forEach(t => {
     t.addEventListener("click", () => openWord(t.dataset.word));
   });
@@ -989,6 +1104,124 @@ function renderDictation(def, p) {
       }, 1300);
     }
   }
+}
+
+/* ---------- Paragraph practice ---------- */
+function openParagraph() {
+  state.view = "paragraph";
+  state.paragraph = { mode: "read", index: 0 };
+  render();
+}
+
+function renderParagraph() {
+  const pg = state.paragraph || (state.paragraph = { mode: "read", index: 0 });
+  const sentences = PARAGRAPH.sentences;
+  const fullText = sentences.join(" ");
+
+  if (pg.mode === "read") {
+    main.innerHTML = `
+      <div class="session-bar">
+        <div class="label">📖 ${PARAGRAPH.title}</div>
+        <button class="chip" id="paraExit">Home</button>
+      </div>
+      <div class="card">
+        <div class="word-pic">${SVG.paragraph}</div>
+        <div class="paragraph-text">
+          ${sentences.map((s, i) => `<button class="sentence-btn" data-i="${i}">${s}</button>`).join(" ")}
+        </div>
+        <div class="row">
+          <button class="btn secondary" id="hearAll">🔊 Hear paragraph</button>
+          <button class="btn good" id="startType">Type each sentence ✏️</button>
+        </div>
+        <div class="feedback" id="fb">Tap any sentence to hear it.</div>
+      </div>
+    `;
+    document.getElementById("paraExit").addEventListener("click", goDashboard);
+    document.getElementById("hearAll").addEventListener("click", () => speak(fullText));
+    document.getElementById("startType").addEventListener("click", () => {
+      pg.mode = "type";
+      pg.index = 0;
+      render();
+    });
+    document.querySelectorAll(".sentence-btn").forEach(b => {
+      b.addEventListener("click", () => speak(sentences[+b.dataset.i]));
+    });
+    return;
+  }
+
+  // type mode: dictate one sentence at a time
+  const i = pg.index;
+  const target = sentences[i];
+
+  main.innerHTML = `
+    <div class="session-bar">
+      <div class="label">✏️ Sentence ${i + 1} / ${sentences.length}</div>
+      <button class="chip" id="paraExit">Home</button>
+    </div>
+    <div class="card">
+      <div class="word-pic">${SVG.paragraph}</div>
+      <div class="sentence" style="font-size:1rem;">Listen, then write the sentence.</div>
+      <textarea class="answer paragraph-answer" id="ans" rows="3" autocomplete="off" autocapitalize="sentences" spellcheck="false"></textarea>
+      <div class="row">
+        <button class="btn secondary" id="speakBtn">🔊 Hear it again</button>
+        <button class="btn ghost" id="showBtn">👁 Show me</button>
+        <button class="btn good" id="checkBtn">Check ✓</button>
+      </div>
+      <div class="feedback" id="fb"></div>
+    </div>
+    <div class="nav-row">
+      <button class="btn ghost" id="prevSent" ${i === 0 ? "disabled" : ""}>◀ Back</button>
+      <div class="word-counter">Sentence ${i + 1} of ${sentences.length}</div>
+      <button class="btn" id="nextSent">${i === sentences.length - 1 ? "Finish" : "Skip ▶"}</button>
+    </div>
+  `;
+
+  const input = document.getElementById("ans");
+  input.focus();
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); doCheck(); }
+  });
+  document.getElementById("speakBtn").addEventListener("click", () => speak(target));
+  document.getElementById("checkBtn").addEventListener("click", doCheck);
+  document.getElementById("paraExit").addEventListener("click", goDashboard);
+  document.getElementById("showBtn").addEventListener("click", () => {
+    fb(target, "good");
+    speak(target);
+  });
+  document.getElementById("prevSent").addEventListener("click", () => {
+    if (pg.index > 0) { pg.index--; render(); }
+  });
+  document.getElementById("nextSent").addEventListener("click", () => {
+    if (pg.index < sentences.length - 1) { pg.index++; render(); }
+    else { pg.mode = "read"; render(); }
+  });
+  setTimeout(() => speak(target), 250);
+
+  function doCheck() {
+    const ans = normalizeSentence(input.value);
+    const want = normalizeSentence(target);
+    if (!ans) { fb("Listen, then write the sentence.", "bad"); return; }
+    if (ans === want) {
+      input.classList.add("correct");
+      fb("⭐ Perfect! On to the next.", "good");
+      setTimeout(() => {
+        if (pg.index < sentences.length - 1) { pg.index++; render(); }
+        else { pg.mode = "read"; fb("All sentences done! 🎉", "good"); render(); }
+      }, 900);
+    } else {
+      input.classList.add("wrong");
+      fb(`Almost! It's: "${target}"`, "bad");
+      setTimeout(() => { input.classList.remove("wrong"); speak(target); input.focus(); }, 1400);
+    }
+  }
+}
+
+function normalizeSentence(s) {
+  return (s || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[.,!?;:"]/g, "")
+    .replace(/\s+/g, " ");
 }
 
 /* ---------- Tiny helpers ---------- */

@@ -399,6 +399,57 @@
     min-height: 80px;
   }
 
+  .voice-list { display: flex; flex-direction: column; gap: 8px; }
+  .voice-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 10px 12px;
+    box-shadow: var(--shadow);
+  }
+  .voice-row.selected {
+    border-color: var(--good-dark);
+    background: #ecfbe9;
+  }
+  .voice-info { flex: 1; min-width: 0; }
+  .voice-name {
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .voice-meta {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .voice-tag {
+    display: inline-block;
+    background: var(--warn);
+    color: #fff;
+    padding: 1px 6px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .voice-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .voice-actions .btn { padding: 8px 12px; font-size: 0.85rem; min-height: 0; min-width: 0; }
+  @media (max-width: 420px) {
+    .voice-row { flex-wrap: wrap; }
+    .voice-actions { width: 100%; justify-content: flex-end; }
+  }
+
   @media (max-width: 380px) {
     .word-list { grid-template-columns: repeat(2, 1fr); }
     .dash-summary { grid-template-columns: repeat(5, 1fr); }
@@ -414,6 +465,7 @@
     <div class="top-actions">
       <button class="icon-btn" id="btnHome" title="Home" aria-label="Home">🏠</button>
       <button class="icon-btn" id="btnDaily" title="Daily 10" aria-label="Daily Practice">⚡</button>
+      <button class="icon-btn" id="btnVoice" title="Voice settings" aria-label="Voice settings">🔊</button>
     </div>
   </header>
 
@@ -573,25 +625,109 @@ function levelOf(p) {
 const LEVEL_LABEL = ["Not started", "Learning", "Practising", "Dictation ready", "Mastered"];
 
 /* ---------- Speech ---------- */
+const VOICE_KEY = "spelling-voice-v1";
+const PREFERRED_VOICE_NAMES = [
+  "Samantha", "Ava", "Allison", "Susan", "Karen", "Serena", "Tessa",
+  "Moira", "Kate", "Catherine", "Fiona", "Veena", "Daniel", "Aaron"
+];
+const QUALITY_KEYWORDS = [
+  "premium", "enhanced", "neural", "natural", "wavenet", "online", "google", "siri", "hd"
+];
+
 let voicesReady = false;
-function loadVoices() { try { window.speechSynthesis && window.speechSynthesis.getVoices(); voicesReady = true; } catch(e) {} }
+function loadVoices() {
+  try { window.speechSynthesis && window.speechSynthesis.getVoices(); voicesReady = true; } catch(e) {}
+}
 if (typeof speechSynthesis !== "undefined") {
   speechSynthesis.onvoiceschanged = loadVoices;
   loadVoices();
 }
-function speak(text) {
+
+function getEnglishVoices() {
+  if (!("speechSynthesis" in window)) return [];
+  const voices = speechSynthesis.getVoices() || [];
+  return voices.filter(v => /^en/i.test(v.lang));
+}
+
+function rankVoice(v) {
+  let score = 0;
+  const name = (v.name || "").toLowerCase();
+  const lang = (v.lang || "").toLowerCase();
+  for (const kw of QUALITY_KEYWORDS) if (name.includes(kw)) score += 60;
+  for (let i = 0; i < PREFERRED_VOICE_NAMES.length; i++) {
+    if (v.name && v.name.includes(PREFERRED_VOICE_NAMES[i])) {
+      score += 40 - i * 2;
+      break;
+    }
+  }
+  if (lang === "en-gb") score += 20;
+  else if (lang === "en-au") score += 14;
+  else if (lang === "en-us") score += 10;
+  else if (lang.startsWith("en")) score += 4;
+  if (v.localService) score += 6;
+  if (v.default) score += 2;
+  return score;
+}
+
+function getBestVoice() {
+  const voices = getEnglishVoices();
+  if (!voices.length) return null;
+  const saved = localStorage.getItem(VOICE_KEY);
+  if (saved) {
+    const found = voices.find(v => v.name === saved);
+    if (found) return found;
+  }
+  return voices.slice().sort((a, b) => rankVoice(b) - rankVoice(a))[0];
+}
+
+function setPreferredVoice(name) {
+  if (name) localStorage.setItem(VOICE_KEY, name);
+  else localStorage.removeItem(VOICE_KEY);
+}
+
+function speak(text, opts) {
+  opts = opts || {};
   if (!("speechSynthesis" in window)) return false;
   try {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.rate = 0.85;
-    u.pitch = 1.05;
-    u.lang = "en-GB";
-    const voices = speechSynthesis.getVoices();
-    const pref = voices.find(v => /en[-_]GB/i.test(v.lang)) ||
-                 voices.find(v => /en/i.test(v.lang));
-    if (pref) u.voice = pref;
+    u.rate = opts.rate != null ? opts.rate : 0.85;
+    u.pitch = opts.pitch != null ? opts.pitch : 1.05;
+    const voice = opts.voice || getBestVoice();
+    if (voice) {
+      u.voice = voice;
+      u.lang = voice.lang;
+    } else {
+      u.lang = "en-GB";
+    }
     speechSynthesis.speak(u);
+    return true;
+  } catch (e) { return false; }
+}
+
+/* Speak each letter, then the whole word, with friendly pacing. */
+function spellOut(word) {
+  if (!("speechSynthesis" in window)) return false;
+  try {
+    speechSynthesis.cancel();
+    const voice = getBestVoice();
+    const letters = (word || "").split("").filter(c => /[a-z]/i.test(c));
+    letters.forEach(letter => {
+      const u = new SpeechSynthesisUtterance(letter.toUpperCase());
+      u.rate = 0.7;
+      u.pitch = 1.1;
+      if (voice) { u.voice = voice; u.lang = voice.lang; } else { u.lang = "en-GB"; }
+      speechSynthesis.speak(u);
+    });
+    const pause = new SpeechSynthesisUtterance(",");
+    pause.rate = 0.6;
+    if (voice) { pause.voice = voice; pause.lang = voice.lang; }
+    speechSynthesis.speak(pause);
+    const whole = new SpeechSynthesisUtterance(word);
+    whole.rate = 0.8;
+    whole.pitch = 1.05;
+    if (voice) { whole.voice = voice; whole.lang = voice.lang; } else { whole.lang = "en-GB"; }
+    speechSynthesis.speak(whole);
     return true;
   } catch (e) { return false; }
 }
@@ -768,8 +904,108 @@ const main = document.getElementById("main");
 function render() {
   if (state.view === "dashboard") renderDashboard();
   else if (state.view === "paragraph") renderParagraph();
+  else if (state.view === "voice") renderVoice();
   else renderWord();
 }
+
+function openVoice() {
+  state.view = "voice";
+  render();
+  // Re-render once voices arrive (iOS sometimes loads them async after first gesture)
+  if ("speechSynthesis" in window) {
+    speechSynthesis.onvoiceschanged = () => {
+      voicesReady = true;
+      if (state.view === "voice") render();
+    };
+    // Nudge it
+    speechSynthesis.getVoices();
+  }
+}
+
+function renderVoice() {
+  const voices = getEnglishVoices().slice().sort((a, b) => rankVoice(b) - rankVoice(a));
+  const current = getBestVoice();
+  const sample = "Hello! I am ready to help you spell. The cat sat on the mat.";
+
+  const rows = voices.length
+    ? voices.map(v => {
+        const isCurrent = current && v.name === current.name;
+        const tags = [];
+        const lower = (v.name || "").toLowerCase();
+        for (const kw of QUALITY_KEYWORDS) {
+          if (lower.includes(kw)) { tags.push(kw); break; }
+        }
+        return `
+          <div class="voice-row ${isCurrent ? "selected" : ""}">
+            <div class="voice-info">
+              <div class="voice-name">${v.name}</div>
+              <div class="voice-meta">
+                ${v.lang}${tags.length ? ` · <span class="voice-tag">${tags[0]}</span>` : ""}
+                ${v.localService ? " · on-device" : ""}
+              </div>
+            </div>
+            <div class="voice-actions">
+              <button class="btn ghost voice-try" data-name="${escapeAttr(v.name)}">▶ Try</button>
+              <button class="btn ${isCurrent ? "good" : "secondary"} voice-pick" data-name="${escapeAttr(v.name)}">${isCurrent ? "✓ Using" : "Use"}</button>
+            </div>
+          </div>
+        `;
+      }).join("")
+    : `<div class="card" style="text-align:center;color:var(--muted);">
+         No voices found yet. Tap any "Try" button below or pull this page to refresh.
+       </div>`;
+
+  main.innerHTML = `
+    <div class="session-bar">
+      <div class="label">🔊 Voice Settings</div>
+      <button class="chip" id="voiceBack">Back</button>
+    </div>
+
+    <div class="card">
+      <div style="font-weight:800;margin-bottom:6px;">For the best voice on iPad / iPhone</div>
+      <div style="color:var(--muted);font-size:0.95rem;line-height:1.4;">
+        Open <b>Settings → Accessibility → Spoken Content → Voices → English</b>
+        and download a voice marked <b>Premium</b> or <b>Enhanced</b>
+        (Ava, Samantha, Karen, Serena are great). Then come back here and pick it.
+        Premium voices sound very close to Siri.
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-weight:800;margin-bottom:8px;">Sample sentence</div>
+      <div class="sentence" style="margin-bottom:10px;">"${sample}"</div>
+      <div class="row">
+        <button class="btn secondary" id="voiceSample">🔊 Hear with current voice</button>
+        <button class="btn ghost" id="voiceReset">Reset to auto</button>
+      </div>
+    </div>
+
+    <div class="voice-list">${rows}</div>
+  `;
+
+  document.getElementById("voiceBack").addEventListener("click", goDashboard);
+  document.getElementById("voiceSample").addEventListener("click", () => speak(sample));
+  document.getElementById("voiceReset").addEventListener("click", () => {
+    setPreferredVoice(null);
+    render();
+  });
+  document.querySelectorAll(".voice-try").forEach(b => {
+    b.addEventListener("click", () => {
+      const v = voices.find(vv => vv.name === b.dataset.name);
+      if (v) speak(sample, { voice: v });
+    });
+  });
+  document.querySelectorAll(".voice-pick").forEach(b => {
+    b.addEventListener("click", () => {
+      setPreferredVoice(b.dataset.name);
+      const v = voices.find(vv => vv.name === b.dataset.name);
+      if (v) speak("Great choice!", { voice: v });
+      render();
+    });
+  });
+}
+
+function escapeAttr(s) { return String(s).replace(/"/g, "&quot;"); }
 
 function renderDashboard() {
   const counts = [0,0,0,0,0];
@@ -937,13 +1173,17 @@ function renderLearn(def, p) {
     <div class="sentence">${sentenceWithWord(def.sentence, def.word)}</div>
     <div class="row">
       <button class="btn secondary" id="speakBtn">🔊 Hear it</button>
+      <button class="btn secondary" id="spellBtn">🔤 Spell it out</button>
       <button class="btn" id="speakSentence">🗣️ Read sentence</button>
       <button class="btn good" id="learnedBtn">I know it! ✓</button>
     </div>
     <div class="feedback" id="fb"></div>
   `;
   document.getElementById("speakBtn").addEventListener("click", () => {
-    if (!speak(def.word)) flashMessage("Speech not available on this device.");
+    if (!speak(def.word, { rate: 0.75 })) flashMessage("Speech not available on this device.");
+  });
+  document.getElementById("spellBtn").addEventListener("click", () => {
+    if (!spellOut(def.word)) flashMessage("Speech not available on this device.");
   });
   document.getElementById("speakSentence").addEventListener("click", () => {
     speak(def.sentence.replace(/_+/g, def.word));
@@ -1240,6 +1480,7 @@ function flashMessage(msg) {
 /* ---------- Init ---------- */
 document.getElementById("btnHome").addEventListener("click", goDashboard);
 document.getElementById("btnDaily").addEventListener("click", startDaily);
+document.getElementById("btnVoice").addEventListener("click", openVoice);
 
 state.progress = loadProgress();
 goDashboard();

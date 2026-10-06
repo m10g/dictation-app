@@ -305,7 +305,7 @@ const DETECTIVE = [
   ["They’re playing the recorder.","Theyre playing the recorder.","they’re playing the recorder."],
   ["Joe thinks it is difficult to repeat after the teacher.","Joe thinks it is difficult to repeat after the teacher","joe thinks it is difficult to repeat after the teacher."],
   ["“Oh, no!” Says Joe.","“Oh no!” Says Joe.","“Oh, no!” says Joe."],
-  ["“I’m in the wrong class.”","“Im in the wrong class.”","“I’m in the wrong class”],
+  ["“I’m in the wrong class.”","“Im in the wrong class.”","“I’m in the wrong class”"],
   ["Joe and the other pupils laugh.","Joe and the other pupils laugh","joe and the other pupils laugh."],
   ["Joe goes to his classroom.","Joe goes to his classroom","joe goes to his classroom."]
 ];
@@ -353,21 +353,21 @@ function celebrate(petId,stars=1,snack=false){
   const s=document.createElement("div");s.className="flystar";s.textContent="⭐";
   s.style.left=(source.left+source.width/2)+"px";s.style.top=(source.top+source.height/2)+"px";
   document.body.appendChild(s);
-  requestAnimationFrame(()=>{s.style.transform=\`translate(\${target.left-source.left}px,\${target.top-source.top}px) scale(.4)\`;s.style.opacity=".2"});
+  requestAnimationFrame(()=>{s.style.transform=`translate(${target.left-source.left}px,${target.top-source.top}px) scale(.4)`;s.style.opacity=".2"});
   setTimeout(()=>{s.remove();$("starPill").classList.remove("bump");void $("starPill").offsetWidth;$("starPill").classList.add("bump")},760);
   if(snack){setTimeout(()=>{$("snackPill").classList.remove("bump");void $("snackPill").offsetWidth;$("snackPill").classList.add("bump")},900)}
-  for(let k=0;k<6;k++){const c=document.createElement("div");c.className="confetti";c.textContent=["✨","⭐","🎉"][k%3];c.style.left=(source.left+source.width/2)+"px";c.style.top=(source.top+10)+"px";c.style.setProperty("--x",\`\${(Math.random()-.5)*180}px\`);c.style.setProperty("--y",\`\${50+Math.random()*130}px\`);document.body.appendChild(c);setTimeout(()=>c.remove(),1050)}
+  for(let k=0;k<6;k++){const c=document.createElement("div");c.className="confetti";c.textContent=["✨","⭐","🎉"][k%3];c.style.left=(source.left+source.width/2)+"px";c.style.top=(source.top+10)+"px";c.style.setProperty("--x",`${(Math.random()-.5)*180}px`);c.style.setProperty("--y",`${50+Math.random()*130}px`);document.body.appendChild(c);setTimeout(()=>c.remove(),1050)}
 }
 function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
 function track(elId,current,done,total){
-  const el=$(elId);el.innerHTML=Array.from({length:total},(_,n)=>\`<div class="node \${done.includes(n)?"done":""} \${n===current?"now":""}">\${n+1}</div>\`).join("");
+  const el=$(elId);el.innerHTML=Array.from({length:total},(_,n)=>`<div class="node ${done.includes(n)?"done":""} ${n===current?"now":""}">${n+1}</div>`).join("");
   setTimeout(()=>movePet(elId.replace("Track","JourneyPet"),elId,current),50)
 }
 function movePet(petId,trackId,current){
   const pet=$(petId),tr=$(trackId);if(!pet||!tr)return;
   const nodes=[...tr.querySelectorAll(".node")],node=nodes[Math.min(current,nodes.length-1)];if(!node)return;
   const r=node.getBoundingClientRect(),pr=pet.parentElement.getBoundingClientRect();
-  pet.style.transform=\`translate(\${r.left-pr.left+r.width/2-14}px,\${r.top-pr.top-23}px)\`;
+  pet.style.transform=`translate(${r.left-pr.left+r.width/2-14}px,${r.top-pr.top-23}px)`;
 }
 window.addEventListener("resize",()=>{["builder","spell","detective","boss"].forEach(m=>{const i=m==="builder"?builder.i:m==="spell"?spell.i:m==="detective"?detective.i:boss.i;movePet(m+"JourneyPet",m+"Track",i)})});
 
@@ -381,7 +381,7 @@ function startCountdown(memoryId,timerId,text,seconds,onDone){
   const start=Date.now(),iv=setInterval(()=>{const left=Math.max(0,1-(Date.now()-start)/(seconds*1000));bar.style.width=(left*100)+"%";if(left<=0){clearInterval(iv);mem.classList.add("hiding");later(()=>{mem.className="memory hidden";mem.textContent="🙈 Hidden — now use your memory!";onDone()},560)}},80);timers.push(iv)
 }
 
-document.querySelectorAll(".petbtn").forEach(b=>b.onclick=()=>{state.pet=b.dataset.name;state.color=b.dataset.color;save();$("homeSpeech").textContent=\`\${state.pet} is ready! ✨\`});
+document.querySelectorAll(".petbtn").forEach(b=>b.onclick=()=>{state.pet=b.dataset.name;state.color=b.dataset.color;save();$("homeSpeech").textContent=`${state.pet} is ready! ✨`});
 $("startBest").onclick=()=>startBuilder();
 $("builderMode").onclick=()=>startBuilder();
 $("spellMode").onclick=()=>startSpell();
@@ -390,8 +390,8 @@ $("bossMode").onclick=()=>startBoss();
 
 function startBuilder(){builder={i:0,round:"chunks",selected:[],order:[]};showView("builder");later(loadBuilder,250)}
 function loadBuilder(){
-  const {i,round}=builder;track("builderTrack",i,state.builderDone,8);$("builderProgress").style.width=\`\${(i/8)*100}%\`;
-  $("builderTitle").textContent=\`Sentence Builder • \${i+1} of 8\`;
+  const {i,round}=builder;track("builderTrack",i,state.builderDone,8);$("builderProgress").style.width=`${(i/8)*100}%`;
+  $("builderTitle").textContent=`Sentence Builder • ${i+1} of 8`;
   $("builderRoundBadge").textContent=round==="chunks"?"Round 1 • Phrase tiles":"Round 2 • Word tiles";
   $("builderFeedback").className="feedback";$("builderPlay").style.display="none";
   builder.selected=[];builder.order=[];
@@ -436,8 +436,8 @@ $("builderCheck").onclick=()=>{
 function startSpell(){spell={i:0,selected:[],order:[]};showView("spell");later(loadSpell,250)}
 function loadSpell(){
   const w=SPELL_WORDS[spell.i];spell.selected=[];spell.order=[];
-  track("spellTrack",spell.i,state.spellDone,8);$("spellProgress").style.width=\`\${(spell.i/8)*100}%\`;
-  $("spellBadge").textContent=\`Word \${spell.i+1} of 8\`;$("spellClue").textContent=w.clue;$("spellPlay").style.display="none";$("spellFeedback").className="feedback";
+  track("spellTrack",spell.i,state.spellDone,8);$("spellProgress").style.width=`${(spell.i/8)*100}%`;
+  $("spellBadge").textContent=`Word ${spell.i+1} of 8`;$("spellClue").textContent=w.clue;$("spellPlay").style.display="none";$("spellFeedback").className="feedback";
   startCountdown("spellPreview","spellTimer",w.word,4,()=>setupSpell())
 }
 function setupSpell(){
@@ -451,7 +451,7 @@ function setupSpell(){
 function spellBuilt(){return spell.selected.map(id=>spell.order.find(x=>x.id===id).ch).join("")}
 function renderSpell(){
   const w=SPELL_WORDS[spell.i].word,built=spellBuilt();
-  $("spellSlots").innerHTML=[...w].map((_,n)=>\`<span class="letterSlot">\${[...built][n]||""}</span>\`).join("");
+  $("spellSlots").innerHTML=[...w].map((_,n)=>`<span class="letterSlot">${[...built][n]||""}</span>`).join("");
   $("spellBank").innerHTML="";
   spell.order.forEach(item=>{
     const b=document.createElement("button");b.className="tile letter"+(spell.selected.includes(item.id)?" used":"");b.textContent=item.ch;
@@ -475,8 +475,8 @@ $("spellPeek").onclick=()=>loadSpell();
 
 function startDetective(){detective={i:0,locked:false};showView("detective");later(loadDetective,250)}
 function loadDetective(){
-  detective.locked=false;track("detectiveTrack",detective.i,state.detectiveDone,8);$("detectiveProgress").style.width=\`\${(detective.i/8)*100}%\`;
-  $("detectiveBadge").textContent=\`Case \${detective.i+1} of 8\`;$("detectiveFeedback").className="feedback";
+  detective.locked=false;track("detectiveTrack",detective.i,state.detectiveDone,8);$("detectiveProgress").style.width=`${(detective.i/8)*100}%`;
+  $("detectiveBadge").textContent=`Case ${detective.i+1} of 8`;$("detectiveFeedback").className="feedback";
   const options=shuffle(DETECTIVE[detective.i].map((text,idx)=>({text,correct:idx===0})));
   $("detectiveChoices").innerHTML="";
   options.forEach(o=>{const b=document.createElement("button");b.className="choice";b.textContent=o.text;b.onclick=()=>chooseDetective(b,o.correct);$("detectiveChoices").appendChild(b)})
@@ -495,7 +495,7 @@ function chooseDetective(btn,correct){
 
 function startBoss(){boss={i:0};showView("boss");later(loadBoss,250)}
 function loadBoss(){
-  track("bossTrack",boss.i,state.bossDone,8);$("bossProgress").style.width=\`\${(boss.i/8)*100}%\`;$("bossBadge").textContent=\`Sentence \${boss.i+1} of 8\`;
+  track("bossTrack",boss.i,state.bossDone,8);$("bossProgress").style.width=`${(boss.i/8)*100}%`;$("bossBadge").textContent=`Sentence ${boss.i+1} of 8`;
   $("bossPaper").style.display="none";$("bossRevealBox").className="reveal";$("bossSelfCheck").style.display="none";
   startCountdown("bossMemory","bossTimer",SENTENCES[boss.i].text,state.preview,()=>{$("bossPaper").style.display="block";later(()=>$("bossPaper").scrollIntoView({behavior:"smooth",block:"center"}),80)})
 }

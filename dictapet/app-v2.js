@@ -5,7 +5,7 @@ const SENTENCES = [
   {text:"It’s ten o’clock and the pupils are in the music room.", chunks:["It’s ten o’clock","and the pupils are","in the music room."]},
   {text:"They’re playing the recorder.", chunks:["They’re playing","the recorder."]},
   {text:"Joe thinks it is difficult to repeat after the teacher.", chunks:["Joe thinks it is difficult","to repeat","after the teacher."]},
-  {text:"“Oh, no!” Says Joe.", chunks:["“Oh, no!”","Says Joe."]},
+  {text:"“Oh, no!” says Joe.", chunks:["“Oh, no!”","says Joe."]},
   {text:"“I’m in the wrong class.”", chunks:["“I’m in","the wrong class.”"]},
   {text:"Joe and the other pupils laugh.", chunks:["Joe and the other pupils","laugh."]},
   {text:"Joe goes to his classroom.", chunks:["Joe goes","to his classroom."]}
@@ -27,7 +27,7 @@ const DETECTIVE = [
   ["It’s ten o’clock and the pupils are in the music room.","It’s ten oclock and the pupils are in the music room.","It’s ten o’clock and the pupils are in the music room"],
   ["They’re playing the recorder.","Theyre playing the recorder.","they’re playing the recorder."],
   ["Joe thinks it is difficult to repeat after the teacher.","Joe thinks it is difficult to repeat after the teacher","joe thinks it is difficult to repeat after the teacher."],
-  ["“Oh, no!” Says Joe.","“Oh no!” Says Joe.","“Oh, no!” says Joe."],
+  ["“Oh, no!” says Joe.","“Oh no!” says Joe.","“Oh, no!” Says Joe."],
   ["“I’m in the wrong class.”","“Im in the wrong class.”","“I’m in the wrong class”"],
   ["Joe and the other pupils laugh.","Joe and the other pupils laugh","joe and the other pupils laugh."],
   ["Joe goes to his classroom.","Joe goes to his classroom","joe goes to his classroom."]

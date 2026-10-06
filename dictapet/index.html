@@ -4,60 +4,160 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#fff8df">
-<title>DictaPet — Joe's Wrong-Class Adventure</title>
-<style>
-:root{--ink:#303651;--bg:#fff8df;--card:#fff;--yellow:#ffd86b;--blue:#91d8ff;--green:#89dda9;--red:#ffaaa8;--line:#d9d2bd}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:linear-gradient(#fffef8,#fff5d8);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}button,textarea,select{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}.app{max-width:760px;margin:auto;padding:16px}.top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}.brand{font-weight:950;font-size:21px}.stats{display:flex;gap:7px}.pill{background:#fff;border:2px solid var(--ink);border-radius:999px;padding:6px 10px;font-weight:900}.screen{display:none}.screen.on{display:block}.card{background:rgba(255,255,255,.95);border:3px solid var(--ink);border-radius:24px;padding:18px;margin-bottom:14px;box-shadow:0 7px 0 rgba(48,54,81,.1)}h1{font-size:33px;line-height:1.05;margin:0 0 9px}h2{font-size:25px;margin:0 0 8px}.sub{line-height:1.45;color:#61677e}.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;align-items:center}@media(max-width:600px){.hero{grid-template-columns:1fr}.petstage{order:-1}}.petstage{min-height:190px;border:3px solid var(--ink);border-radius:22px;background:linear-gradient(#dff3ff 0 64%,#dff0c4 65%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}.pet{--pet:#ffe07a;width:108px;height:96px;background:var(--pet);border:4px solid var(--ink);border-radius:49% 49% 43% 43%;position:relative;animation:bob 1.8s ease-in-out infinite;box-shadow:inset 0 -8px 0 rgba(255,255,255,.18)}.pet:before,.pet:after{content:"";position:absolute;top:-19px;width:29px;height:33px;background:var(--pet);border:4px solid var(--ink);z-index:-1}.pet:before{left:4px;border-radius:70% 30% 20% 20%;transform:rotate(-17deg)}.pet:after{right:4px;border-radius:30% 70% 20% 20%;transform:rotate(17deg)}.eye{position:absolute;top:38px;width:11px;height:14px;background:var(--ink);border-radius:50%}.eye.l{left:25px}.eye.r{right:25px}.cheek{position:absolute;top:57px;width:16px;height:9px;background:#ff9baa;border-radius:50%}.cheek.l{left:10px}.cheek.r{right:10px}.mouth{position:absolute;left:44px;top:61px;width:16px;height:10px;border-bottom:4px solid var(--ink);border-radius:50%}.pet.sad .mouth{border-bottom:0;border-top:4px solid var(--ink);top:69px}.hat{position:absolute;left:33px;top:-29px;width:40px;height:21px;background:#6db9ff;border:4px solid var(--ink);border-radius:9px 9px 3px 3px}.hat:after{content:"";position:absolute;left:-9px;bottom:-7px;width:54px;height:7px;background:#6db9ff;border:4px solid var(--ink);border-radius:8px}.speech{position:absolute;right:8px;top:9px;max-width:130px;background:#fff;border:3px solid var(--ink);border-radius:15px;padding:7px 9px;font-size:12px;font-weight:900}@keyframes bob{50%{transform:translateY(-7px) rotate(1deg)}}.pets{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}@media(max-width:520px){.pets{grid-template-columns:repeat(2,1fr)}}.petbtn,.mode,.primary,.secondary,.danger{border:3px solid var(--ink);border-radius:17px;background:#fff;font-weight:900;box-shadow:0 4px 0 rgba(48,54,81,.12)}.petbtn{padding:11px 8px;text-align:center}.petbtn.sel{outline:5px solid #ffe69b;transform:translateY(-2px)}.petbtn span{display:block;font-size:39px;margin-bottom:3px}.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:560px){.modes{grid-template-columns:1fr}}.mode{padding:15px;text-align:left}.mode b{display:block;font-size:18px;margin-bottom:4px}.mode small{color:#666d84;line-height:1.35}.primary,.secondary,.danger{padding:11px 15px}.primary{background:var(--yellow)}.danger{background:#ffd0d0}.btnrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}.mission{display:flex;justify-content:space-between;gap:10px;font-weight:900;font-size:14px;margin-bottom:7px}.bar{height:15px;background:#eee9da;border:2px solid var(--ink);border-radius:99px;overflow:hidden}.bar>div{height:100%;background:var(--green);width:0%;transition:width .25s}.doors{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin-top:12px}.door{aspect-ratio:.75;background:#efc374;border:2px solid var(--ink);border-radius:7px 7px 3px 3px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900}.door.done{background:var(--green)}.door.now{outline:4px solid #ffd057}.sentence{min-height:122px;border:3px dashed #d39a24;border-radius:18px;background:#fff4bf;padding:20px 16px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:24px;line-height:1.4;font-weight:850}.sentence.hide{background:#eaf5ff;border-color:#78add5;color:#6f7d93;font-size:18px}.timer{height:9px;background:#eee8d8;border-radius:99px;overflow:hidden;margin:11px 0}.timer>div{height:100%;background:#ffb548;width:100%}textarea{width:100%;min-height:115px;border:3px solid var(--ink);border-radius:17px;padding:13px 14px;font-size:20px;line-height:1.4;outline:none;resize:vertical}textarea:focus{box-shadow:0 0 0 5px #dcefff}.feedback{display:none;margin-top:13px;border-radius:16px;padding:12px 14px;font-weight:750;line-height:1.4}.feedback.show{display:block}.feedback.good{background:#dcf7e8;border:2px solid #49b87c}.feedback.try{background:#fff0cf;border:2px solid #dda13a}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.chip{background:#fff;border:2px solid var(--ink);border-radius:99px;padding:4px 8px;font-size:12px}.answer{margin-top:9px;background:#fff;border:2px solid var(--ink);border-radius:12px;padding:10px}.score{font-size:56px;font-weight:950;text-align:center;margin:5px 0}.report{display:grid;grid-template-columns:1fr 1fr;gap:9px}@media(max-width:500px){.report{grid-template-columns:1fr}}.report>div{border:2px solid var(--line);border-radius:13px;padding:11px}.setting{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #e6e0d3}.tiny{font-size:12px;color:#70768b}.footer{text-align:center;font-size:12px;color:#777d90;margin:16px 0}.shake{animation:shake .3s linear}@keyframes shake{25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
-</style>
+<title>DictaPet — Aaron's Dictation Adventure</title>
+<link rel="stylesheet" href="style-v2.css">
 </head>
 <body>
 <div class="app">
-<div class="top"><div class="brand">📚 DictaPet</div><div class="stats"><span class="pill">⭐ <span id="stars">0</span></span><span class="pill">🍪 <span id="snacks">0</span></span></div></div>
-<section id="home" class="screen on">
-<div class="card hero"><div><h1>Joe's Wrong-Class Adventure</h1><p class="sub">Help Aaron practise <b>Part B dictation</b> with a cute virtual pet. No listening needed: look, remember, hide, then write exactly.</p><button class="primary" id="chooseDown">Choose a pet ↓</button></div><div class="petstage"><div class="pet" id="homePet"><span class="hat"></span><span class="eye l"></span><span class="eye r"></span><span class="cheek l"></span><span class="cheek r"></span><span class="mouth"></span></div><div class="speech">Let's help Joe! ✨</div></div></div>
-<div class="card" id="petsCard"><h2>1. Choose a DictaPet</h2><p class="sub">Your pet earns stars and snacks as Aaron masters the exact passage.</p><div class="pets"><button class="petbtn" data-name="Pipo" data-color="#ffe07a"><span>🐣</span>Pipo</button><button class="petbtn" data-name="Mimi" data-color="#ffb8d0"><span>🐰</span>Mimi</button><button class="petbtn" data-name="Toto" data-color="#a8dcff"><span>🐭</span>Toto</button><button class="petbtn" data-name="Bibi" data-color="#b8eca9"><span>🐸</span>Bibi</button></div></div>
-<div class="card"><h2>2. Pick a mission</h2><div class="modes"><button class="mode" id="memoryMode"><b>👀 Look • Hide • Type</b><small>See one sentence briefly, then reproduce it exactly from memory.</small></button><button class="mode" id="fixMode"><b>🧼 Clean-Up Challenge</b><small>Repair spelling, capitals, apostrophes and punctuation.</small></button><button class="mode" id="testMode"><b>🏆 Memory Test</b><small>Only a story cue appears. Score starts at 60.</small></button><button class="mode" id="settingsMode"><b>⚙️ Settings</b><small>Change preview time or reset progress.</small></button></div></div>
-<div class="footer">Based on Aaron's Dictation 1 — Part B. Progress stays on this device.</div>
-</section>
-<section id="practice" class="screen"><div class="card"><div class="mission"><span id="missionTitle"></span><span id="petLabel"></span></div><div class="bar"><div id="missionBar"></div></div><div class="doors" id="doors"></div></div><div class="card"><div class="petstage" style="min-height:145px;margin-bottom:12px"><div class="pet" id="practicePet"><span class="hat"></span><span class="eye l"></span><span class="eye r"></span><span class="cheek l"></span><span class="cheek r"></span><span class="mouth"></span></div><div class="speech" id="speech">Look carefully!</div></div><div class="sentence" id="sentence"></div><div class="timer"><div id="timer"></div></div><div id="previewRow" class="btnrow"><button class="secondary" id="hideNow">I'm ready — hide it 🙈</button></div><div id="writeArea" style="display:none"><p class="sub"><b>Type the sentence exactly.</b> Capitals, apostrophes and punctuation count.</p><textarea id="practiceInput" spellcheck="false" autocapitalize="sentences" placeholder="Type here..."></textarea><div class="btnrow"><button class="primary" id="checkPractice">Check ✅</button><button class="secondary" id="peek">Quick peek (1 ⭐)</button></div></div><div class="feedback" id="practiceFeedback"></div><div class="btnrow"><button class="secondary homeBtn">← Home</button></div></div></section>
-<section id="fix" class="screen"><div class="card"><div class="mission"><span id="fixTitle"></span><span>🧼</span></div><div class="bar"><div id="fixBar"></div></div></div><div class="card"><h2>Clean your DictaPet!</h2><p class="sub">Rewrite the dirty sentence correctly.</p><div class="sentence" id="dirty"></div><textarea id="fixInput" spellcheck="false"></textarea><div class="btnrow"><button class="primary" id="scrub">Scrub! 🫧</button><button class="secondary homeBtn">← Home</button></div><div class="feedback" id="fixFeedback"></div></div></section>
-<section id="test" class="screen"><div class="card"><div class="mission"><span id="testTitle"></span><span>Score: <b id="liveScore">60</b>/60</span></div><div class="bar"><div id="testBar"></div></div></div><div class="card"><h2>🏆 Memory Test</h2><p class="sub">No sentence preview. Use the story cue and recall the exact wording from Part B.</p><div class="sentence" id="cue"></div><textarea id="testInput" spellcheck="false" placeholder="Exact sentence..."></textarea><div class="btnrow"><button class="primary" id="lockAnswer">Lock answer 🔒</button><button class="secondary homeBtn">Quit</button></div></div></section>
-<section id="result" class="screen"><div class="card"><h2 style="text-align:center">🎉 Mission Complete!</h2><div class="score" id="finalScore"></div><p class="sub" id="resultMsg" style="text-align:center"></p><div class="report" id="report"></div><div class="btnrow" style="justify-content:center"><button class="primary" id="again">Try again</button><button class="secondary homeBtn">Home</button></div></div></section>
-<section id="settings" class="screen"><div class="card"><h2>⚙️ Settings</h2><div class="setting"><div><b>Sentence preview</b><div class="tiny">How long Aaron can look before it disappears.</div></div><select id="preview"><option value="8">8 seconds</option><option value="5">5 seconds</option><option value="3">3 seconds</option></select></div><div class="setting"><div><b>Saved progress</b><div class="tiny">Stars, snacks and cleared missions.</div></div><button class="danger" id="reset">Reset</button></div><div class="btnrow"><button class="primary homeBtn">Done</button></div></div></section>
+  <div class="top">
+    <div class="brand">📚 DictaPet</div>
+    <div class="stats">
+      <span class="pill" id="starPill">⭐ <span id="stars">0</span></span>
+      <span class="pill" id="snackPill">🍪 <span id="snacks">0</span></span>
+    </div>
+  </div>
+
+  <section id="home" class="view active">
+    <div class="card hero">
+      <div>
+        <span class="badge">Made for Aaron • age 7</span>
+        <h1>Joe's Wrong-Class Adventure</h1>
+        <p class="sub">Touch-first dictation practice. No keyboard needed: look, tap, build, spell, then write on paper like the real dictation.</p>
+        <div class="btnrow"><button class="primary" id="startBest">Start the learning path 🚀</button></div>
+      </div>
+      <div class="petstage">
+        <div class="pet" id="homePet"><span class="hat"></span><span class="eye l"></span><span class="eye r"></span><span class="cheek l"></span><span class="cheek r"></span><span class="mouth"></span></div>
+        <div class="speech" id="homeSpeech">Tap, learn, then write! ✏️</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Choose a DictaPet</h2>
+      <div class="pets">
+        <button class="petbtn" data-name="Pipo" data-color="#ffe07a" data-emoji="🐣"><span>🐣</span>Pipo</button>
+        <button class="petbtn" data-name="Mimi" data-color="#ffb8d0" data-emoji="🐰"><span>🐰</span>Mimi</button>
+        <button class="petbtn" data-name="Toto" data-color="#a8dcff" data-emoji="🐭"><span>🐭</span>Toto</button>
+        <button class="petbtn" data-name="Bibi" data-color="#b8eca9" data-emoji="🐸"><span>🐸</span>Bibi</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Practice missions</h2>
+      <div class="modes">
+        <button class="mode" id="builderMode"><b>🧩 Sentence Builder</b><small>First arrange phrase tiles, then word tiles. Builds exact wording without typing.</small></button>
+        <button class="mode" id="spellMode"><b>🔤 Spelling Lab</b><small>Tap letter tiles to build the tricky words Aaron needs to remember.</small></button>
+        <button class="mode" id="detectiveMode"><b>🔎 Punctuation Detective</b><small>Choose the exact sentence with the right capitals, apostrophes and punctuation.</small></button>
+        <button class="mode" id="bossMode"><b>🏆 Boss Battle: Paper Dictation</b><small>Look, hide, write on paper, then reveal and check. Closest to the real test.</small></button>
+      </div>
+    </div>
+    <div class="footer">Part B only • progress stays on this device</div>
+  </section>
+
+  <section id="builder" class="view">
+    <div class="card">
+      <h3 id="builderTitle">Sentence Builder</h3>
+      <div class="journey">
+        <div class="journeyPet" id="builderJourneyPet">🐣</div>
+        <div class="track" id="builderTrack"></div>
+      </div>
+      <div class="progressline"><div id="builderProgress"></div></div>
+    </div>
+    <div class="card challenge" id="builderCard">
+      <span class="badge" id="builderRoundBadge">Round 1 • Phrase tiles</span>
+      <div class="memory" id="builderMemory"></div>
+      <div class="timer"><div id="builderTimer"></div></div>
+      <div id="builderPlay" style="display:none">
+        <h3 id="builderPrompt">Build the sentence</h3>
+        <div class="answerzone empty" id="builderAnswer"></div>
+        <div class="bank" id="builderBank"></div>
+        <div class="btnrow">
+          <button class="primary" id="builderCheck">Check ✅</button>
+          <button class="ghost" id="builderUndo">Undo ↩️</button>
+          <button class="secondary" id="builderReplay">Look again 👀</button>
+        </div>
+        <div class="feedback" id="builderFeedback"></div>
+      </div>
+      <div class="btnrow"><button class="secondary homeBtn">← Home</button></div>
+    </div>
+  </section>
+
+  <section id="spell" class="view">
+    <div class="card">
+      <h3>🔤 Spelling Lab</h3>
+      <div class="journey">
+        <div class="journeyPet" id="spellJourneyPet">🐣</div>
+        <div class="track" id="spellTrack"></div>
+      </div>
+      <div class="progressline"><div id="spellProgress"></div></div>
+    </div>
+    <div class="card challenge" id="spellCard">
+      <span class="badge" id="spellBadge">Word 1</span>
+      <p class="sub" id="spellClue"></p>
+      <div class="bigword" id="spellPreview"></div>
+      <div class="timer"><div id="spellTimer"></div></div>
+      <div id="spellPlay" style="display:none">
+        <div class="spellSlots" id="spellSlots"></div>
+        <div class="bank" id="spellBank" style="justify-content:center"></div>
+        <div class="btnrow" style="justify-content:center">
+          <button class="ghost" id="spellBack">⌫ Back</button>
+          <button class="secondary" id="spellPeek">Look again 👀</button>
+        </div>
+        <div class="feedback" id="spellFeedback"></div>
+      </div>
+      <div class="btnrow"><button class="secondary homeBtn">← Home</button></div>
+    </div>
+  </section>
+
+  <section id="detective" class="view">
+    <div class="card">
+      <h3>🔎 Punctuation Detective</h3>
+      <div class="journey">
+        <div class="journeyPet" id="detectiveJourneyPet">🐣</div>
+        <div class="track" id="detectiveTrack"></div>
+      </div>
+      <div class="progressline"><div id="detectiveProgress"></div></div>
+    </div>
+    <div class="card challenge" id="detectiveCard">
+      <span class="badge" id="detectiveBadge">Case 1 of 8</span>
+      <h2>Which one is exactly right?</h2>
+      <p class="sub">Tap the sentence with the correct capital letters, apostrophes and punctuation.</p>
+      <div class="choicegrid" id="detectiveChoices"></div>
+      <div class="feedback" id="detectiveFeedback"></div>
+      <div class="btnrow"><button class="secondary homeBtn">← Home</button></div>
+    </div>
+  </section>
+
+  <section id="boss" class="view">
+    <div class="card">
+      <h3>🏆 Boss Battle: Paper Dictation</h3>
+      <div class="journey">
+        <div class="journeyPet" id="bossJourneyPet">🐣</div>
+        <div class="track" id="bossTrack"></div>
+      </div>
+      <div class="progressline"><div id="bossProgress"></div></div>
+    </div>
+    <div class="card challenge" id="bossCard">
+      <span class="badge" id="bossBadge">Sentence 1 of 8</span>
+      <div class="memory" id="bossMemory"></div>
+      <div class="timer"><div id="bossTimer"></div></div>
+      <div id="bossPaper" class="paperbox" style="display:none">
+        <div class="papericon">✏️📄</div>
+        <h2>Write it on paper</h2>
+        <p class="sub">No keyboard. Write the whole sentence exactly as you would in school.</p>
+        <div class="btnrow" style="justify-content:center"><button class="primary" id="bossReveal">I finished — reveal answer 👀</button></div>
+        <div class="reveal" id="bossRevealBox"></div>
+        <div id="bossSelfCheck" style="display:none">
+          <p><b>Compare every word, capital letter, apostrophe and punctuation mark.</b></p>
+          <div class="btnrow" style="justify-content:center">
+            <button class="primary" id="bossPerfect">It matches exactly ⭐</button>
+            <button class="ghost" id="bossRetry">One more go 🔁</button>
+          </div>
+        </div>
+      </div>
+      <div class="btnrow"><button class="secondary homeBtn">← Home</button></div>
+    </div>
+  </section>
 </div>
-<script>
-'use strict';
-const S=[
-{text:"It’s Joe’s first day at his new school.",cue:"🏫 Joe • first day • new school",dirty:"its Joes first day at his new school"},
-{text:"It’s ten o’clock and the pupils are in the music room.",cue:"🕙 ten o’clock • pupils • music room 🎵",dirty:"Its ten oclock and the pupiles are in the music room"},
-{text:"They’re playing the recorder.",cue:"🎶 pupils • playing • recorder",dirty:"theyre playing the recoder"},
-{text:"Joe thinks it is difficult to repeat after the teacher.",cue:"🤔 Joe • difficult • repeat • teacher",dirty:"joe thinks it is dificullt to repeat after the teacher"},
-{text:"“Oh, no!” Says Joe.",cue:"😲 Joe realises the mistake • Oh, no!",dirty:"oh no says Joe"},
-{text:"“I’m in the wrong class.”",cue:"🚪 Joe says • wrong class",dirty:"Im in the wrong class"},
-{text:"Joe and the other pupils laugh.",cue:"😂 Joe • other pupils • laugh",dirty:"joe and the other pupills laugh"},
-{text:"Joe goes to his classroom.",cue:"✅ Joe • goes • his classroom",dirty:"Joe goes to his classrom"}
-];
-const $=id=>document.getElementById(id);let state={pet:'Pipo',color:'#ffe07a',stars:0,snacks:0,done:[],preview:8};try{state={...state,...JSON.parse(localStorage.getItem('dictapetState')||'{}')}}catch(e){};let i=0,attempt=0,tick=null,peekTimer=null,locked=false,score=60,report=[];
-function persist(){try{localStorage.setItem('dictapetState',JSON.stringify(state))}catch(e){}sync()}
-function sync(){$('stars').textContent=state.stars;$('snacks').textContent=state.snacks;$('petLabel').textContent=state.pet;document.querySelectorAll('.pet').forEach(x=>x.style.setProperty('--pet',state.color));document.querySelectorAll('.petbtn').forEach(x=>x.classList.toggle('sel',x.dataset.name===state.pet))}
-function clearTimers(){clearInterval(tick);clearTimeout(peekTimer);tick=peekTimer=null;locked=false}
-function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));$(id).classList.add('on');window.scrollTo({top:0,behavior:'smooth'})}
-function home(){clearTimers();show('home');sync()}
-document.querySelectorAll('.homeBtn').forEach(b=>b.addEventListener('click',home));$('chooseDown').onclick=()=>$('petsCard').scrollIntoView({behavior:'smooth'});document.querySelectorAll('.petbtn').forEach(b=>b.onclick=()=>{state.pet=b.dataset.name;state.color=b.dataset.color;persist()});
-function canon(s){return s.trim().replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/\s+/g,' ')}function words(s){return canon(s).split(' ').filter(Boolean)}function part(w){return{letters:w.replace(/[^A-Za-z]/g,''),low:w.replace(/[^A-Za-z]/g,'').toLowerCase(),pun:w.replace(/[A-Za-z]/g,'')}}
-function editDist(a,b){const A=[...a],B=[...b],d=Array.from({length:A.length+1},()=>Array(B.length+1).fill(0));for(let x=0;x<=A.length;x++)d[x][0]=x;for(let y=0;y<=B.length;y++)d[0][y]=y;for(let x=1;x<=A.length;x++)for(let y=1;y<=B.length;y++)d[x][y]=Math.min(d[x-1][y]+1,d[x][y-1]+1,d[x-1][y-1]+(A[x-1]===B[y-1]?0:1));return d[A.length][B.length]}
-function align(e,a){const E=words(e),A=words(a),n=E.length,m=A.length,d=Array.from({length:n+1},()=>Array(m+1).fill(0)),op=Array.from({length:n+1},()=>Array(m+1));for(let x=1;x<=n;x++){d[x][0]=x;op[x][0]='del'}for(let y=1;y<=m;y++){d[0][y]=y;op[0][y]='ins'}for(let x=1;x<=n;x++)for(let y=1;y<=m;y++){let same=part(E[x-1]).low===part(A[y-1]).low,c=[[d[x-1][y]+1,'del'],[d[x][y-1]+1,'ins'],[d[x-1][y-1]+(same?0:1),same?'match':'sub']].sort((p,q)=>p[0]-q[0]);[d[x][y],op[x][y]]=c[0]}let x=n,y=m,r=[];while(x||y){let o=op[x][y];if(o==='match'||o==='sub'){r.push([E[x-1],A[y-1],o]);x--;y--}else if(o==='del'){r.push([E[x-1],null,o]);x--}else{r.push([null,A[y-1],o]);y--}}return r.reverse()}
-function analyse(e,a){if(canon(e)===canon(a))return{exact:true,sp:0,cap:0,pun:0,miss:0,extra:0,deduct:0};let r={exact:false,sp:0,cap:0,pun:0,miss:0,extra:0,deduct:0};for(const [x,y,o] of align(e,a)){if(o==='del'){r.miss++;continue}if(o==='ins'){r.extra++;continue}let X=part(x),Y=part(y);if(X.low!==Y.low){r.sp++;continue}if(X.letters!==Y.letters)r.cap++;r.pun+=editDist(X.pun,Y.pun)}r.deduct=(r.sp+r.miss+r.extra)*3+r.cap+r.pun;return r}
-function chips(r){let a=[];if(r.sp)a.push(`Spelling × ${r.sp}`);if(r.miss)a.push(`Missing word × ${r.miss}`);if(r.extra)a.push(`Extra word × ${r.extra}`);if(r.cap)a.push(`Capital × ${r.cap}`);if(r.pun)a.push(`Punctuation/apostrophe × ${r.pun}`);return'<div class="chips">'+a.map(x=>`<span class="chip">${x}</span>`).join('')+'</div>'}
-function doors(){$('doors').innerHTML=S.map((_,n)=>`<div class="door ${state.done.includes(n)?'done':''} ${n===i?'now':''}">${n+1}</div>`).join('')}
-function mood(sad){$('practicePet').classList.toggle('sad',sad)}
-function startMemory(){clearTimers();i=0;show('practice');loadMemory()}function loadMemory(){clearInterval(tick);attempt=0;locked=false;doors();$('missionTitle').textContent=`Mission ${i+1} of 8`;$('missionBar').style.width=`${i/8*100}%`;$('sentence').className='sentence';$('sentence').textContent=S[i].text;$('previewRow').style.display='flex';$('writeArea').style.display='none';$('practiceInput').value='';$('practiceFeedback').className='feedback';$('speech').textContent=`Look carefully for ${state.preview} seconds!`;mood(false);let start=Date.now();$('timer').style.width='100%';tick=setInterval(()=>{let left=Math.max(0,1-(Date.now()-start)/(state.preview*1000));$('timer').style.width=(left*100)+'%';if(!left)hideSentence()},100)}
-function hideSentence(){clearInterval(tick);$('sentence').className='sentence hide';$('sentence').textContent='🙈 Sentence hidden! Remember it exactly.';$('timer').style.width='0%';$('previewRow').style.display='none';$('writeArea').style.display='block';$('speech').textContent='You can do it! ✏️';setTimeout(()=>$('practiceInput').focus(),100)}
-$('hideNow').onclick=hideSentence;$('peek').onclick=()=>{if(locked)return;if(state.stars<1){$('speech').textContent='You need 1 ⭐ for a peek!';return}state.stars--;persist();clearTimeout(peekTimer);$('sentence').className='sentence';$('sentence').textContent=S[i].text;peekTimer=setTimeout(()=>{$('sentence').className='sentence hide';$('sentence').textContent='🙈 Hidden again!'},1700)};
-$('checkPractice').onclick=()=>{if(locked)return;let input=$('practiceInput');if(!input.value.trim()){input.classList.add('shake');setTimeout(()=>input.classList.remove('shake'),350);return}let r=analyse(S[i].text,input.value),f=$('practiceFeedback');if(r.exact){locked=true;let earn=attempt?2:3;state.stars+=earn;state.snacks++;if(!state.done.includes(i))state.done.push(i);persist();f.className='feedback good show';f.innerHTML=`<b>Perfect!</b> +${earn} ⭐ +1 🍪`;mood(false);$('speech').textContent='Perfect! ⭐';setTimeout(()=>{i++;if(i===8){state.stars+=5;persist();f.innerHTML='<b>All 8 missions complete!</b> Bonus +5 ⭐ 🎓';setTimeout(home,1400)}else loadMemory()},900)}else{attempt++;mood(true);$('speech').textContent='Find the sneaky mistakes! 🔎';f.className='feedback try show';f.innerHTML='<b>Fix these and try again.</b>'+chips(r)+(attempt>1?`<div class="answer"><span class="tiny">Correct sentence</span><br>${S[i].text}</div>`:'')}};
-function startFix(){clearTimers();i=0;show('fix');loadFix()}function loadFix(){locked=false;attempt=0;$('fixTitle').textContent=`Clean-Up ${i+1} of 8`;$('fixBar').style.width=`${i/8*100}%`;$('dirty').textContent=S[i].dirty;$('fixInput').value=S[i].dirty;$('fixFeedback').className='feedback'}$('scrub').onclick=()=>{if(locked)return;let r=analyse(S[i].text,$('fixInput').value),f=$('fixFeedback');if(r.exact){locked=true;state.stars+=2;state.snacks++;persist();f.className='feedback good show';f.innerHTML='<b>Squeaky clean! 🫧✨</b> +2 ⭐ +1 🍪';setTimeout(()=>{i++;i===8?home():loadFix()},800)}else{attempt++;f.className='feedback try show';f.innerHTML='<b>Still a little dirty.</b>'+chips(r)+(attempt>1?`<div class="answer">${S[i].text}</div>`:'')}};
-function startTest(){clearTimers();i=0;score=60;report=[];show('test');loadTest()}function loadTest(){locked=false;$('testTitle').textContent=`Memory Test — Sentence ${i+1} of 8`;$('liveScore').textContent=score;$('testBar').style.width=`${i/8*100}%`;$('cue').textContent=S[i].cue;$('testInput').value='';setTimeout(()=>$('testInput').focus(),80)}$('lockAnswer').onclick=()=>{if(locked||!$('testInput').value.trim())return;locked=true;let r=analyse(S[i].text,$('testInput').value);score=Math.max(0,score-r.deduct);report.push({i,r});i++;i===8?finishTest():loadTest()};function finishTest(){state.stars+=Math.max(1,Math.round(score/10));if(score>=54)state.snacks+=3;persist();show('result');$('finalScore').textContent=`${score}/60`;$('resultMsg').textContent=score>=57?'Amazing — almost exam-ready! 🌟':score>=48?'Strong work. Practise the weak sentences once more. 💪':'Good practice. Use Look • Hide • Type to build exact wording. 📚';let t=report.reduce((a,x)=>{a.word+=x.r.sp+x.r.miss+x.r.extra;a.pp+=x.r.cap+x.r.pun;return a},{word:0,pp:0}),weak=report.filter(x=>!x.r.exact).map(x=>x.i+1);$('report').innerHTML=`<div><b>Word / spelling</b><div class="score" style="font-size:30px">${t.word}</div><div class="tiny">3 marks each in this game</div></div><div><b>Capital / punctuation</b><div class="score" style="font-size:30px">${t.pp}</div><div class="tiny">1 mark each</div></div><div style="grid-column:1/-1"><b>${weak.length?'Practise again':'Perfect memory test! 🏆'}</b><div class="tiny" style="margin-top:5px">${weak.length?'Sentences '+weak.join(', '):'All eight sentences were exact.'}</div></div>`}
-$('memoryMode').onclick=startMemory;$('fixMode').onclick=startFix;$('testMode').onclick=startTest;$('again').onclick=startTest;$('settingsMode').onclick=()=>{$('preview').value=String(state.preview);show('settings')};$('preview').onchange=()=>{state.preview=Number($('preview').value);persist()};$('reset').onclick=()=>{if(confirm("Reset Aaron's stars, snacks and completed missions?")){state.stars=0;state.snacks=0;state.done=[];persist();alert('Progress reset.')}};sync();
-</script>
+<script src="app-v2.js"></script>
 </body>
 </html>

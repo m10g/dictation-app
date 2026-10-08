@@ -120,6 +120,16 @@ button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(48,54,81,.12)}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
 }
 
+
+.partA{background:linear-gradient(135deg,#fffdf4,#edf9ff)}
+.vocabOverview{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.vocabChip{border:2px solid var(--ink);border-radius:999px;padding:5px 9px;background:#fff;font-size:12px;font-weight:850}
+.vocabScoreRule{margin-top:12px;padding:9px 11px;border-radius:13px;background:#fff3cf;border:2px solid #e4b650;font-size:12px;font-weight:800;line-height:1.4}
+.vocabHeader{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;font-weight:900;color:#626980}
+.vocabMascot{font-size:31px;display:inline-block;animation:bob 1.8s ease-in-out infinite}
+.wordGroup{display:inline-flex;gap:4px;margin:3px 2px}
+.spaceGap{width:12px;display:inline-block}
+
 </style>
 <script>document.documentElement.dataset.jsboot="1";</script>
 </head>
@@ -137,8 +147,8 @@ button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(48,54,81,.12)}
     <div class="card hero">
       <div>
         <span class="badge">Made for Aaron • age 7</span>
-        <h1>Joe's Wrong-Class Adventure</h1>
-        <p class="sub">Touch-first dictation practice. No keyboard needed: look, tap, build, spell, then write on paper like the real dictation.</p>
+        <h1>Aaron's Dictation Adventure</h1>
+        <p class="sub">Touch-first practice for <b>Part A vocabulary</b> and <b>Part B paragraph</b>. No keyboard needed: look, tap, build, spell, then write on paper.</p>
         <div class="btnrow"><button class="primary" id="startBest">Start the learning path 🚀</button></div>
       </div>
       <div class="petstage">
@@ -157,8 +167,22 @@ button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(48,54,81,.12)}
       </div>
     </div>
 
+    <div class="card partA">
+      <span class="badge">Part A • Vocabulary • 30 marks</span>
+      <h2>🔤 Vocabulary Mission</h2>
+      <p class="sub">Learn <b>all 12 words</b>. The school will choose <b>10</b>. Aaron sees each word briefly, then rebuilds it with large letter tiles — no keyboard.</p>
+      <div class="vocabOverview">
+        <span class="vocabChip">classroom</span><span class="vocabChip">wrong</span><span class="vocabChip">playground</span><span class="vocabChip">laugh</span>
+        <span class="vocabChip">computer studies</span><span class="vocabChip">homework</span><span class="vocabChip">understand</span><span class="vocabChip">science</span>
+        <span class="vocabChip">break time</span><span class="vocabChip">different</span><span class="vocabChip">strange</span><span class="vocabChip">maths</span>
+      </div>
+      <div class="vocabScoreRule">School marking: spelling mistake = 3 marks • capitalization mistake = 1 mark. The listed Part A words are lowercase.</div>
+      <div class="btnrow"><button class="primary" id="vocabMode">Practise Part A 🔤</button></div>
+    </div>
+
     <div class="card">
-      <h2>Practice missions</h2>
+      <span class="badge">Part B • Paragraph • 60 marks</span>
+      <h2>Paragraph practice missions</h2>
       <div class="modes">
         <button class="mode" id="builderMode"><b>🧩 Sentence Builder</b><small>First arrange phrase tiles, then word tiles. Builds exact wording without typing.</small></button>
         <button class="mode" id="spellMode"><b>🔤 Spelling Lab</b><small>Tap letter tiles to build the tricky words Aaron needs to remember.</small></button>
@@ -166,7 +190,37 @@ button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(48,54,81,.12)}
         <button class="mode" id="bossMode"><b>🏆 Boss Battle: Paper Dictation</b><small>Look, hide, write on paper, then reveal and check. Closest to the real test.</small></button>
       </div>
     </div>
-    <div class="footer">Part B only • progress stays on this device</div>
+    <div class="footer">Part A + Part B • progress stays on this device</div>
+  </section>
+
+  <section id="vocab" class="view">
+    <div class="card">
+      <span class="badge">Part A • 30 marks</span>
+      <h3>🔤 Vocabulary Mission</h3>
+      <div class="vocabHeader">
+        <span id="vocabDoneCount">0/12 learned • school chooses 10</span>
+        <span class="vocabMascot" id="vocabMascot">🐣</span>
+      </div>
+      <div class="progressline"><div id="vocabProgress"></div></div>
+    </div>
+    <div class="card challenge" id="vocabCard">
+      <span class="badge" id="vocabBadge">Word 1 of 12</span>
+      <p class="sub" id="vocabClue"></p>
+      <div class="bigword" id="vocabPreview"></div>
+      <div class="timer"><div id="vocabTimer"></div></div>
+      <div id="vocabPlay" style="display:none">
+        <p class="sub"><b>Build the word exactly from memory.</b> Tap the letters in order.</p>
+        <div class="spellSlots" id="vocabSlots"></div>
+        <div class="bank" id="vocabBank" style="justify-content:center"></div>
+        <div class="btnrow" style="justify-content:center">
+          <button class="primary" id="vocabCheck">Check ✅</button>
+          <button class="ghost" id="vocabBack">⌫ Back</button>
+          <button class="secondary" id="vocabPeek">Look again 👀</button>
+        </div>
+        <div class="feedback" id="vocabFeedback"></div>
+      </div>
+      <div class="btnrow"><button class="secondary homeBtn">← Home</button></div>
+    </div>
   </section>
 
   <section id="builder" class="view">
@@ -288,6 +342,21 @@ const SENTENCES = [
   {text:"Joe goes to his classroom.", chunks:["Joe goes","to his classroom."]}
 ];
 
+const VOCAB = [
+  {word:"classroom",icon:"🏫",hint:"a room where pupils learn"},
+  {word:"wrong",icon:"❌",hint:"not correct"},
+  {word:"playground",icon:"🛝",hint:"where pupils play"},
+  {word:"laugh",icon:"😂",hint:"what you do when something is funny"},
+  {word:"computer studies",icon:"💻",hint:"a school subject using computers"},
+  {word:"homework",icon:"📚",hint:"school work you do at home"},
+  {word:"understand",icon:"💡",hint:"know what something means"},
+  {word:"science",icon:"🔬",hint:"a school subject with experiments"},
+  {word:"break time",icon:"🍎",hint:"time to rest at school"},
+  {word:"different",icon:"🔀",hint:"not the same"},
+  {word:"strange",icon:"👽",hint:"unusual or odd"},
+  {word:"maths",icon:"➗",hint:"a school subject with numbers"}
+];
+
 const SPELL_WORDS = [
   {word:"It’s",clue:"It is — remember the apostrophe"},
   {word:"Joe’s",clue:"Something belonging to Joe"},
@@ -313,7 +382,7 @@ const DETECTIVE = [
 const PET_EMOJI={Pipo:"🐣",Mimi:"🐰",Toto:"🐭",Bibi:"🐸"};
 const $=id=>document.getElementById(id);
 
-let state={pet:"Pipo",color:"#ffe07a",stars:0,snacks:0,builderDone:[],spellDone:[],detectiveDone:[],bossDone:[],preview:6};
+let state={pet:"Pipo",color:"#ffe07a",stars:0,snacks:0,vocabDone:[],builderDone:[],spellDone:[],detectiveDone:[],bossDone:[],preview:6};
 try{
   const saved=JSON.parse(localStorage.getItem("dictapetStateV2")||"null");
   if(saved) state={...state,...saved};
@@ -323,7 +392,7 @@ try{
   }
 }catch(e){}
 
-let activeView="home", timers=[], builder={i:0,round:"chunks",selected:[],order:[]}, spell={i:0,selected:[],order:[]}, detective={i:0,locked:false}, boss={i:0};
+let activeView="home", timers=[], vocab={i:0,selected:[],order:[],locked:false}, builder={i:0,round:"chunks",selected:[],order:[]}, spell={i:0,selected:[],order:[]}, detective={i:0,locked:false}, boss={i:0};
 
 function save(){
   try{localStorage.setItem("dictapetStateV2",JSON.stringify(state))}catch(e){}
@@ -382,11 +451,86 @@ function startCountdown(memoryId,timerId,text,seconds,onDone){
 }
 
 document.querySelectorAll(".petbtn").forEach(b=>b.onclick=()=>{state.pet=b.dataset.name;state.color=b.dataset.color;save();$("homeSpeech").textContent=`${state.pet} is ready! ✨`});
-$("startBest").onclick=()=>startBuilder();
+$("startBest").onclick=()=>startVocab();
+$("vocabMode").onclick=()=>startVocab();
 $("builderMode").onclick=()=>startBuilder();
 $("spellMode").onclick=()=>startSpell();
 $("detectiveMode").onclick=()=>startDetective();
 $("bossMode").onclick=()=>startBoss();
+
+
+function startVocab(){
+  vocab={i:0,selected:[],order:[],locked:false};
+  showView("vocab");
+  later(loadVocab,250);
+}
+function vocabTarget(){return VOCAB[vocab.i].word.replace(/\s/g,"")}
+function vocabBuilt(){return vocab.selected.map(id=>vocab.order.find(x=>x.id===id).ch).join("")}
+function loadVocab(){
+  const item=VOCAB[vocab.i];
+  vocab.selected=[];vocab.order=[];vocab.locked=false;
+  $("vocabBadge").textContent=`Word ${vocab.i+1} of 12`;
+  $("vocabProgress").style.width=`${(vocab.i/12)*100}%`;
+  $("vocabDoneCount").textContent=`${vocab.i}/12 learned • school chooses 10`;
+  $("vocabClue").textContent=`${item.icon}  ${item.hint}`;
+  $("vocabPlay").style.display="none";
+  $("vocabFeedback").className="feedback";
+  startCountdown("vocabPreview","vocabTimer",`${item.icon}  ${item.word}`,4,setupVocab);
+}
+function setupVocab(){
+  const letters=[...vocabTarget()];
+  vocab.order=shuffle(letters.map((ch,id)=>({id,ch})));
+  vocab.selected=[];
+  $("vocabPlay").style.display="block";
+  renderVocab();
+  later(()=>$("vocabPlay").scrollIntoView({behavior:"smooth",block:"center"}),80);
+}
+function renderVocab(){
+  const item=VOCAB[vocab.i],built=[...vocabBuilt()];
+  let p=0;
+  $("vocabSlots").innerHTML=item.word.split(" ").map(word=>{
+    const slots=[...word].map(()=>`<span class="letterSlot">${built[p++]||""}</span>`).join("");
+    return `<span class="wordGroup">${slots}</span>`;
+  }).join('<span class="spaceGap"></span>');
+  $("vocabBank").innerHTML="";
+  vocab.order.forEach(tile=>{
+    const b=document.createElement("button");
+    b.className="tile letter"+(vocab.selected.includes(tile.id)?" used":"");
+    b.textContent=tile.ch;
+    b.onclick=()=>{
+      if(vocab.locked||vocab.selected.includes(tile.id)||vocab.selected.length>=vocabTarget().length)return;
+      vocab.selected.push(tile.id);renderVocab();
+      if(vocab.selected.length===vocabTarget().length)checkVocab();
+    };
+    $("vocabBank").appendChild(b);
+  });
+}
+function checkVocab(){
+  if(vocab.locked)return;
+  const f=$("vocabFeedback");
+  if(vocabBuilt()===vocabTarget()){
+    vocab.locked=true;
+    const snack=(vocab.i+1)%3===0;
+    state.stars+=2;if(snack)state.snacks++;
+    if(!state.vocabDone.includes(vocab.i))state.vocabDone.push(vocab.i);
+    save();celebrate("vocabMascot",2,snack);
+    f.className="feedback good show";
+    f.innerHTML=`<b>Perfect spelling! 🌟</b> +2 ⭐${snack?" +1 🍪":""}`;
+    later(()=>{
+      vocab.i++;
+      if(vocab.i>=VOCAB.length){
+        state.stars+=4;save();showView("home");
+        later(()=>{$("homeSpeech").textContent="Part A complete — all 12 words covered! 🎓";celebrate("homePet",4,true)},320);
+      }else animateSwap("vocabCard",loadVocab);
+    },900);
+  }else{
+    f.className="feedback try show";
+    f.innerHTML="<b>Almost.</b> Check the order of the letters. You can use Back or Look again.";
+  }
+}
+$("vocabBack").onclick=()=>{if(vocab.locked)return;vocab.selected.pop();renderVocab()};
+$("vocabPeek").onclick=()=>{if(!vocab.locked)loadVocab()};
+$("vocabCheck").onclick=()=>{if(vocab.selected.length)checkVocab()};
 
 function startBuilder(){builder={i:0,round:"chunks",selected:[],order:[]};showView("builder");later(loadBuilder,250)}
 function loadBuilder(){

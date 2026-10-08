@@ -111,3 +111,13 @@ button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(48,54,81,.12)}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
 }
+
+
+.partA{background:linear-gradient(135deg,#fffdf4,#edf9ff)}
+.vocabOverview{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.vocabChip{border:2px solid var(--ink);border-radius:999px;padding:5px 9px;background:#fff;font-size:12px;font-weight:850}
+.vocabScoreRule{margin-top:12px;padding:9px 11px;border-radius:13px;background:#fff3cf;border:2px solid #e4b650;font-size:12px;font-weight:800;line-height:1.4}
+.vocabHeader{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;font-weight:900;color:#626980}
+.vocabMascot{font-size:31px;display:inline-block;animation:bob 1.8s ease-in-out infinite}
+.wordGroup{display:inline-flex;gap:4px;margin:3px 2px}
+.spaceGap{width:12px;display:inline-block}

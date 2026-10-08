@@ -11,6 +11,21 @@ const SENTENCES = [
   {text:"Joe goes to his classroom.", chunks:["Joe goes","to his classroom."]}
 ];
 
+const VOCAB = [
+  {word:"classroom",icon:"🏫",hint:"a room where pupils learn"},
+  {word:"wrong",icon:"❌",hint:"not correct"},
+  {word:"playground",icon:"🛝",hint:"where pupils play"},
+  {word:"laugh",icon:"😂",hint:"what you do when something is funny"},
+  {word:"computer studies",icon:"💻",hint:"a school subject using computers"},
+  {word:"homework",icon:"📚",hint:"school work you do at home"},
+  {word:"understand",icon:"💡",hint:"know what something means"},
+  {word:"science",icon:"🔬",hint:"a school subject with experiments"},
+  {word:"break time",icon:"🍎",hint:"time to rest at school"},
+  {word:"different",icon:"🔀",hint:"not the same"},
+  {word:"strange",icon:"👽",hint:"unusual or odd"},
+  {word:"maths",icon:"➗",hint:"a school subject with numbers"}
+];
+
 const SPELL_WORDS = [
   {word:"It’s",clue:"It is — remember the apostrophe"},
   {word:"Joe’s",clue:"Something belonging to Joe"},
@@ -36,7 +51,7 @@ const DETECTIVE = [
 const PET_EMOJI={Pipo:"🐣",Mimi:"🐰",Toto:"🐭",Bibi:"🐸"};
 const $=id=>document.getElementById(id);
 
-let state={pet:"Pipo",color:"#ffe07a",stars:0,snacks:0,builderDone:[],spellDone:[],detectiveDone:[],bossDone:[],preview:6};
+let state={pet:"Pipo",color:"#ffe07a",stars:0,snacks:0,vocabDone:[],builderDone:[],spellDone:[],detectiveDone:[],bossDone:[],preview:6};
 try{
   const saved=JSON.parse(localStorage.getItem("dictapetStateV2")||"null");
   if(saved) state={...state,...saved};
@@ -46,7 +61,7 @@ try{
   }
 }catch(e){}
 
-let activeView="home", timers=[], builder={i:0,round:"chunks",selected:[],order:[]}, spell={i:0,selected:[],order:[]}, detective={i:0,locked:false}, boss={i:0};
+let activeView="home", timers=[], vocab={i:0,selected:[],order:[],locked:false}, builder={i:0,round:"chunks",selected:[],order:[]}, spell={i:0,selected:[],order:[]}, detective={i:0,locked:false}, boss={i:0};
 
 function save(){
   try{localStorage.setItem("dictapetStateV2",JSON.stringify(state))}catch(e){}
@@ -105,11 +120,86 @@ function startCountdown(memoryId,timerId,text,seconds,onDone){
 }
 
 document.querySelectorAll(".petbtn").forEach(b=>b.onclick=()=>{state.pet=b.dataset.name;state.color=b.dataset.color;save();$("homeSpeech").textContent=`${state.pet} is ready! ✨`});
-$("startBest").onclick=()=>startBuilder();
+$("startBest").onclick=()=>startVocab();
+$("vocabMode").onclick=()=>startVocab();
 $("builderMode").onclick=()=>startBuilder();
 $("spellMode").onclick=()=>startSpell();
 $("detectiveMode").onclick=()=>startDetective();
 $("bossMode").onclick=()=>startBoss();
+
+
+function startVocab(){
+  vocab={i:0,selected:[],order:[],locked:false};
+  showView("vocab");
+  later(loadVocab,250);
+}
+function vocabTarget(){return VOCAB[vocab.i].word.replace(/\s/g,"")}
+function vocabBuilt(){return vocab.selected.map(id=>vocab.order.find(x=>x.id===id).ch).join("")}
+function loadVocab(){
+  const item=VOCAB[vocab.i];
+  vocab.selected=[];vocab.order=[];vocab.locked=false;
+  $("vocabBadge").textContent=`Word ${vocab.i+1} of 12`;
+  $("vocabProgress").style.width=`${(vocab.i/12)*100}%`;
+  $("vocabDoneCount").textContent=`${vocab.i}/12 learned • school chooses 10`;
+  $("vocabClue").textContent=`${item.icon}  ${item.hint}`;
+  $("vocabPlay").style.display="none";
+  $("vocabFeedback").className="feedback";
+  startCountdown("vocabPreview","vocabTimer",`${item.icon}  ${item.word}`,4,setupVocab);
+}
+function setupVocab(){
+  const letters=[...vocabTarget()];
+  vocab.order=shuffle(letters.map((ch,id)=>({id,ch})));
+  vocab.selected=[];
+  $("vocabPlay").style.display="block";
+  renderVocab();
+  later(()=>$("vocabPlay").scrollIntoView({behavior:"smooth",block:"center"}),80);
+}
+function renderVocab(){
+  const item=VOCAB[vocab.i],built=[...vocabBuilt()];
+  let p=0;
+  $("vocabSlots").innerHTML=item.word.split(" ").map(word=>{
+    const slots=[...word].map(()=>`<span class="letterSlot">${built[p++]||""}</span>`).join("");
+    return `<span class="wordGroup">${slots}</span>`;
+  }).join('<span class="spaceGap"></span>');
+  $("vocabBank").innerHTML="";
+  vocab.order.forEach(tile=>{
+    const b=document.createElement("button");
+    b.className="tile letter"+(vocab.selected.includes(tile.id)?" used":"");
+    b.textContent=tile.ch;
+    b.onclick=()=>{
+      if(vocab.locked||vocab.selected.includes(tile.id)||vocab.selected.length>=vocabTarget().length)return;
+      vocab.selected.push(tile.id);renderVocab();
+      if(vocab.selected.length===vocabTarget().length)checkVocab();
+    };
+    $("vocabBank").appendChild(b);
+  });
+}
+function checkVocab(){
+  if(vocab.locked)return;
+  const f=$("vocabFeedback");
+  if(vocabBuilt()===vocabTarget()){
+    vocab.locked=true;
+    const snack=(vocab.i+1)%3===0;
+    state.stars+=2;if(snack)state.snacks++;
+    if(!state.vocabDone.includes(vocab.i))state.vocabDone.push(vocab.i);
+    save();celebrate("vocabMascot",2,snack);
+    f.className="feedback good show";
+    f.innerHTML=`<b>Perfect spelling! 🌟</b> +2 ⭐${snack?" +1 🍪":""}`;
+    later(()=>{
+      vocab.i++;
+      if(vocab.i>=VOCAB.length){
+        state.stars+=4;save();showView("home");
+        later(()=>{$("homeSpeech").textContent="Part A complete — all 12 words covered! 🎓";celebrate("homePet",4,true)},320);
+      }else animateSwap("vocabCard",loadVocab);
+    },900);
+  }else{
+    f.className="feedback try show";
+    f.innerHTML="<b>Almost.</b> Check the order of the letters. You can use Back or Look again.";
+  }
+}
+$("vocabBack").onclick=()=>{if(vocab.locked)return;vocab.selected.pop();renderVocab()};
+$("vocabPeek").onclick=()=>{if(!vocab.locked)loadVocab()};
+$("vocabCheck").onclick=()=>{if(vocab.selected.length)checkVocab()};
 
 function startBuilder(){builder={i:0,round:"chunks",selected:[],order:[]};showView("builder");later(loadBuilder,250)}
 function loadBuilder(){

@@ -154,3 +154,11 @@ button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(48,54,81,.12)}
 .historyScore span{font-size:10px;margin-left:2px}
 .historyScore.great{background:#dcf7e8}.historyScore.ok{background:#fff2c8}.historyScore.needs{background:#ffe0df}
 .historyDetails b{display:block;font-size:14px}.historyDetails small{display:block;color:#72788b;margin:2px 0}.missedWords{font-size:12px;line-height:1.35;color:#555c72}
+
+.hearBtn{display:block;width:100%;margin:12px 0 5px;border:3px solid var(--ink);border-radius:17px;background:#dff3ff;font-weight:950;min-height:54px;font-size:18px;box-shadow:0 4px 0 rgba(48,54,81,.12)}
+.listenStatus{text-align:center;min-height:18px;margin-bottom:8px}
+.testEar{font-size:44px}
+.testPrompt .tiny{display:block}
+.testSlots{margin-top:10px;min-height:66px;align-items:center}
+.testPlaceholder{font-size:14px;color:#9499a8;font-weight:800}
+.resultCount{font-size:15px;font-weight:900;color:#656c83;margin-top:-2px;margin-bottom:4px}

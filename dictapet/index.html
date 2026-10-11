@@ -433,8 +433,8 @@ button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(48,54,81,.12)}
       <span class="badge" id="partBTestBadge">Sentence 1 of 8</span>
       <div class="testPrompt partBListenPrompt"><span class="testEar">🎧</span><b>Listen carefully</b><span class="tiny">Punctuation is spoken inline. Contractions such as It’s, Joe’s, o’clock, They’re and I’m are read naturally.</span></div>
       <div class="voiceButtons"><button class="hearBtn" id="partBTestHear">🔊 Hear sentence</button><button class="slowHearBtn" id="partBTestHearSlow">🐢 Hear slowly</button></div>
-      <div class="aiVoiceNote">✨ Free AI British voice. First use downloads the voice model once; generated sentences are cached on this device. If it cannot run, DictaPet falls back automatically.</div>
-      <div class="tiny listenStatus" id="partBTestListenStatus">The same teacher-style script is read twice, with punctuation spoken inline.</div>
+      <div class="aiVoiceNote">🎧 Fixed British-English dictation recording. No AI model runs on the iPad; Aaron hears the same teacher-style sentence every time.</div>
+      <div class="tiny listenStatus" id="partBTestListenStatus">Tap Hear sentence. DictaPet plays a fixed teacher-style recording twice with punctuation inline.</div>
 
       <div class="sentencePad">
         <div class="sentencePadLabel">Aaron’s sentence</div>
@@ -603,7 +603,6 @@ button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(48,54,81,.12)}
     </div>
   </section>
 </div>
-<script src="/kokoro-ai.js"></script>
 <script>
 'use strict';
 
@@ -1183,13 +1182,16 @@ function partBDictationScript(i){
     "Joe goes to his classroom, full stop."
   ][i]||"";
 }
-function partBFullVoiceText(i){
-  const s=partBDictationScript(i);
-  return "Sentence "+(i+1)+". "+s+" Again. "+s;
+let partBFixedAudio=null;
+function partBAudioUrl(i,slowMode){
+  return "/api/dictation-audio?sentence="+(i+1)+"&mode="+(slowMode?"slow":"normal");
 }
 function stopPartBSpeech(){
   try{if("speechSynthesis" in window)window.speechSynthesis.cancel()}catch(e){}
-  try{if(window.DictaPetAI)window.DictaPetAI.stop()}catch(e){}
+  if(partBFixedAudio){
+    try{partBFixedAudio.pause();partBFixedAudio.src=""}catch(e){}
+    partBFixedAudio=null;
+  }
   partBTest.speaking=false;
 }
 function speakPartBFallback(slowMode){
@@ -1200,7 +1202,6 @@ function speakPartBFallback(slowMode){
     return;
   }
   try{
-    window.speechSynthesis.cancel();
     const script=partBDictationScript(partBTest.i);
     let pass=0;
     function run(){
@@ -1227,30 +1228,39 @@ function speakPartBFallback(slowMode){
     status.textContent="Tap Hear sentence to try again.";
   }
 }
-async function speakPartBSentence(slowMode){
+function speakPartBSentence(slowMode){
   if(partBTest.speaking)return;
   const status=$("partBTestListenStatus");
   partBTest.speaking=true;
-  const idx=partBTest.i;
-  if(window.DictaPetAI&&typeof window.DictaPetAI.play==="function"){
-    try{
-      await window.DictaPetAI.play({
-        key:"partb-"+(idx+1)+"-"+(slowMode?"slow":"normal")+"-teacher-v2",
-        text:partBFullVoiceText(idx),
-        speed:slowMode?0.78:0.92,
-        onStatus:function(msg){status.textContent=msg}
-      });
+  try{
+    const audio=new Audio(partBAudioUrl(partBTest.i,slowMode));
+    partBFixedAudio=audio;
+    audio.preload="auto";
+    audio.onplaying=function(){status.textContent=(slowMode?"Slow":"Clear")+" fixed dictation recording… 🔊"};
+    audio.onended=function(){
+      if(partBFixedAudio===audio)partBFixedAudio=null;
       partBTest.speaking=false;
       status.textContent="Now build the sentence. Punctuation was spoken inline.";
-      return;
-    }catch(e){
-      console.warn("Free AI voice unavailable; falling back to the built-in voice.",e);
+    };
+    audio.onerror=function(){
+      if(partBFixedAudio===audio)partBFixedAudio=null;
       partBTest.speaking=false;
-      status.textContent="AI voice unavailable here — using the built-in voice.";
+      status.textContent="Fixed recording could not load — using the built-in voice.";
+      setTimeout(function(){partBTest.speaking=true;speakPartBFallback(slowMode)},180);
+    };
+    const playPromise=audio.play();
+    if(playPromise&&playPromise.catch){
+      playPromise.catch(function(){
+        if(partBFixedAudio===audio)partBFixedAudio=null;
+        partBTest.speaking=false;
+        status.textContent="Tap Hear sentence to try again.";
+      });
     }
+  }catch(e){
+    partBTest.speaking=false;
+    status.textContent="Fixed recording could not start — using the built-in voice.";
+    setTimeout(function(){partBTest.speaking=true;speakPartBFallback(slowMode)},180);
   }
-  partBTest.speaking=true;
-  speakPartBFallback(slowMode);
 }
 function normalizeApostrophes(s){return String(s||"").replace(/'/g,"’")}
 function lexicalTokens(s){
@@ -1303,7 +1313,7 @@ function loadPartBTestSentence(){
   partBTest.answer="";partBTest.caps=false;
   $("partBTestBadge").textContent="Sentence "+(partBTest.i+1)+" of 8";
   $("partBTestProgress").style.width=((partBTest.i/8)*100)+"%";
-  $("partBTestListenStatus").textContent="The same teacher-style script is read twice, with punctuation spoken inline.";
+  $("partBTestListenStatus").textContent="Tap Hear sentence. DictaPet plays a fixed teacher-style recording twice with punctuation inline.";
   $("partBTestFeedback").className="feedback";
   renderPartBPad();
 }

@@ -1,26 +1,31 @@
 name: Generate Part B Dictation Audio
 
 on:
-  workflow_dispatch:
   push:
     paths:
       - ".github/workflows/generate-partb-audio.yml"
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
   generate:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Generate fixed Apple-voice dictation files
+      - name: Install neural TTS
+        run: python -m pip install --disable-pip-version-check edge-tts
+
+      - name: Generate fixed British-English dictation files
         shell: bash
         run: |
           mkdir -p dictapet/audio/partb
           python3 <<'PY'
-          import os, re, subprocess
+          import asyncio
+          from pathlib import Path
+          import edge_tts
 
           scripts = [
               "It's Joe's first day at his new school, full stop.",
@@ -33,37 +38,25 @@ jobs:
               "Joe goes to his classroom, full stop.",
           ]
 
-          available = subprocess.check_output(["say", "-v", "?"], text=True)
-          voice_names = []
-          gb_names = []
-          for line in available.splitlines():
-              m = re.match(r"^([^\s]+)\s+([a-z]{2}_[A-Z]{2})\s+", line)
-              if not m:
-                  continue
-              name, locale = m.groups()
-              voice_names.append(name)
-              if locale == "en_GB":
-                  gb_names.append(name)
+          VOICE = "en-GB-SoniaNeural"
+          OUT = Path("dictapet/audio/partb")
 
-          preferred = ["Serena", "Kate", "Daniel", "Samantha"]
-          voice = next((v for v in preferred if v in voice_names), None)
-          if not voice:
-              voice = gb_names[0] if gb_names else next((v for v in voice_names if v), "Samantha")
-
-          print("Using macOS voice:", voice)
-
-          for idx, script in enumerate(scripts, 1):
+          async def one(idx, script, mode, rate):
               full = f"Sentence {idx}. {script} Again. {script}"
-              for mode, rate in [("normal", 155), ("slow", 125)]:
-                  base = f"dictapet/audio/partb/{idx:02d}-{mode}"
-                  aiff = base + ".aiff"
-                  m4a = base + ".m4a"
-                  subprocess.run(["say", "-v", voice, "-r", str(rate), "-o", aiff, full], check=True)
-                  subprocess.run(["afconvert", "-f", "m4af", "-d", "aac", "-b", "96000", aiff, m4a], check=True)
-                  os.remove(aiff)
+              path = OUT / f"{idx:02d}-{mode}.mp3"
+              communicate = edge_tts.Communicate(full, VOICE, rate=rate)
+              await communicate.save(str(path))
 
-          with open("dictapet/audio/partb/voice.txt", "w", encoding="utf-8") as f:
-              f.write(voice + "\n")
+          async def main():
+              jobs = []
+              for idx, script in enumerate(scripts, 1):
+                  jobs.append(one(idx, script, "normal", "-8%"))
+                  jobs.append(one(idx, script, "slow", "-24%"))
+              await asyncio.gather(*jobs)
+              (OUT / "voice.txt").write_text(VOICE + "\n", encoding="utf-8")
+              (OUT / "script.txt").write_text("\n".join(f"{i+1}. {s}" for i, s in enumerate(scripts)) + "\n", encoding="utf-8")
+
+          asyncio.run(main())
           PY
 
       - name: Commit generated audio
@@ -75,6 +68,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No audio changes."
           else
-            git commit -m "Add prebuilt Part B dictation audio"
+            git commit -m "Add prebuilt Part B neural dictation audio"
             git push
           fi

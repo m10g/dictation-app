@@ -185,3 +185,23 @@ button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(48,54,81,.12)}
   .historyAnswerRow>div:nth-of-type(3){grid-column:2/3}
   .historyAnswerMark{grid-column:3;grid-row:1/3}
 }
+
+
+.partBTestBox{margin-top:15px;padding-top:14px;border-top:3px dashed #ddd5c4}
+.paperWriteCue{display:flex;align-items:center;gap:12px;border:3px solid var(--ink);border-radius:18px;background:#fffdf4;padding:14px;margin-top:14px}
+.paperWriteCue>span{font-size:38px}.paperWriteCue b{display:block}.paperWriteCue small{display:block;color:#747b90;margin-top:3px}
+.bigDone{min-width:170px;font-size:18px}
+.partBListenPrompt{min-height:145px}
+.correctSentence{border:3px solid #79afd7;background:#edf7ff;border-radius:18px;padding:16px;font-size:21px;font-weight:900;line-height:1.45;margin:10px 0 14px}
+.markingGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:560px){.markingGrid{grid-template-columns:1fr}}
+.markCounter{border:3px solid var(--ink);border-radius:18px;padding:12px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.markCounter b{display:block;font-size:14px}.markCounter small{display:block;color:#767d90;margin-top:2px}
+.counterControls{display:flex;align-items:center;gap:8px}
+.counterControls button{width:42px;height:42px;border:3px solid var(--ink);border-radius:12px;background:#eef7ff;font-size:22px;font-weight:950}
+.counterControls strong{min-width:28px;text-align:center;font-size:22px}
+.sentenceDeduction{text-align:center;margin-top:12px;padding:10px;border:2px solid #d6cfbd;border-radius:14px;background:#fff8df;font-weight:900}
+.bHistorySentence{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;border:2px solid var(--line);border-radius:12px;padding:9px}
+.bHistorySentence.perfect{background:#eefaf3}.bHistorySentence.review{background:#fff0ef}
+.bHistorySentence b{display:block;font-size:12px;line-height:1.35}.bHistorySentence small{display:block;font-size:10px;color:#777d90;margin-top:3px}
+.bHistorySentence strong{font-size:13px}

@@ -1,0 +1,19 @@
+{
+  "name": "DictaPet — Aaron's Dictation Adventure",
+  "short_name": "DictaPet",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fff8df",
+  "theme_color": "#fff8df",
+  "description": "Aaron's touch-first dictation practice and test app.",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

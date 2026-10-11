@@ -135,6 +135,55 @@ $("partBHistoryMode").onclick=()=>showPartBHistory();
 
 
 
+
+/* CLEAR DICTATION VOICE */
+let cachedEnglishVoice=null;
+function getClearEnglishVoice(){
+  if(!("speechSynthesis" in window))return null;
+  const voices=window.speechSynthesis.getVoices?window.speechSynthesis.getVoices():[];
+  if(!voices||!voices.length)return cachedEnglishVoice;
+  const preferredNames=[
+    "Samantha","Ava","Serena","Daniel","Karen",
+    "Google UK English Female","Google UK English Male",
+    "Google US English","Microsoft Sonia","Microsoft Aria","Microsoft Jenny"
+  ];
+  function scoreVoice(v){
+    const name=(v.name||"").toLowerCase(),lang=(v.lang||"").toLowerCase();
+    let score=0;
+    if(lang==="en-gb")score+=80;
+    else if(lang==="en-us")score+=70;
+    else if(lang.startsWith("en-"))score+=55;
+    if(v.localService)score+=12;
+    preferredNames.forEach(function(n,idx){
+      if(name.includes(n.toLowerCase()))score+=120-idx*5;
+    });
+    if(name.includes("compact"))score-=30;
+    if(name.includes("novelty"))score-=80;
+    return score;
+  }
+  const english=voices.filter(function(v){return (v.lang||"").toLowerCase().startsWith("en")});
+  if(!english.length)return cachedEnglishVoice;
+  english.sort(function(a,b){return scoreVoice(b)-scoreVoice(a)});
+  cachedEnglishVoice=english[0];
+  return cachedEnglishVoice;
+}
+function makeClearUtterance(text,rate){
+  const u=new SpeechSynthesisUtterance(text);
+  const v=getClearEnglishVoice();
+  u.lang=v&&v.lang?v.lang:"en-GB";
+  if(v)u.voice=v;
+  u.rate=rate||.66;
+  u.pitch=1;
+  u.volume=1;
+  return u;
+}
+try{
+  if("speechSynthesis" in window){
+    getClearEnglishVoice();
+    window.speechSynthesis.onvoiceschanged=function(){cachedEnglishVoice=null;getClearEnglishVoice()};
+  }
+}catch(e){}
+
 /* PART A TEST + SCORE HISTORY */
 function formatTestDate(ts){
   try{return new Date(ts).toLocaleString([], {month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"})}
@@ -219,8 +268,7 @@ function speakVocabTestWord(){
   }
   try{
     window.speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(item.word);
-    u.lang="en-GB";u.rate=.78;u.pitch=1;
+    const u=makeClearUtterance(item.word,.64);
     u.onstart=function(){status.textContent="Listen carefully… 🔊"};
     u.onend=function(){status.textContent="Tap 🔊 Hear word if you want to hear it again."};
     u.onerror=function(){status.textContent="Tap 🔊 Hear word to try again."};
@@ -525,7 +573,29 @@ function stopPartBSpeech(){
   try{if("speechSynthesis" in window)window.speechSynthesis.cancel()}catch(e){}
   partBTest.speaking=false;
 }
-function speakPartBSentence(){
+function partBVoiceChunks(i){
+  if(i===0)return ["It’s Joe’s first day","at his new school."];
+  if(i===1)return ["It’s ten o’clock","and the pupils are","in the music room."];
+  if(i===2)return ["They’re playing","the recorder."];
+  if(i===3)return ["Joe thinks it is difficult","to repeat","after the teacher."];
+  if(i===4)return ["Open quotation mark","Oh, no!","Close quotation mark","says Joe."];
+  if(i===5)return ["Open quotation mark","I’m in the wrong class.","Close quotation mark"];
+  if(i===6)return ["Joe and the other pupils","laugh."];
+  return ["Joe goes","to his classroom."];
+}
+function speakUtteranceSequence(parts,rate,gap,onStatus,onDone){
+  let k=0;
+  function next(){
+    if(k>=parts.length){if(onDone)onDone();return}
+    const u=makeClearUtterance(parts[k],rate);
+    u.onstart=function(){if(onStatus)onStatus(k,parts.length)};
+    u.onend=function(){k++;setTimeout(next,gap)};
+    u.onerror=function(){partBTest.speaking=false;if(onDone)onDone(true)};
+    window.speechSynthesis.speak(u);
+  }
+  next();
+}
+function speakPartBSentence(slowMode){
   if(partBTest.speaking)return;
   const status=$("partBTestListenStatus");
   if(!("speechSynthesis" in window)){
@@ -535,23 +605,41 @@ function speakPartBSentence(){
   partBTest.speaking=true;
   try{
     window.speechSynthesis.cancel();
+    const chunks=partBVoiceChunks(partBTest.i);
     let pass=0;
-    function speakPass(){
-      const intro=new SpeechSynthesisUtterance(pass===0?"Sentence "+(partBTest.i+1)+".":"Again.");
-      intro.lang="en-GB";intro.rate=.82;
-      const line=new SpeechSynthesisUtterance(partBSpokenText(partBTest.i));
-      line.lang="en-GB";line.rate=.72;line.pitch=1;
-      intro.onstart=function(){status.textContent=pass===0?"First reading… 🔊":"Second reading… 🔊"};
-      intro.onend=function(){setTimeout(function(){window.speechSynthesis.speak(line)},220)};
-      line.onend=function(){
-        pass++;
-        if(pass<2)setTimeout(speakPass,650);
-        else{partBTest.speaking=false;status.textContent="Now build the sentence. Tap Hear again if needed."}
+    function runPass(){
+      const label=pass===0?"First reading":"Second reading";
+      const intro=makeClearUtterance(pass===0?"Sentence "+(partBTest.i+1)+".":"Again.",.72);
+      intro.onstart=function(){status.textContent=label+"… 🔊"};
+      intro.onend=function(){
+        setTimeout(function(){
+          speakUtteranceSequence(
+            chunks,
+            slowMode?.52:(pass===0?.64:.58),
+            slowMode?520:360,
+            function(k,total){
+              status.textContent=label+" • part "+(k+1)+" of "+total+" 🔊";
+            },
+            function(failed){
+              if(failed){
+                partBTest.speaking=false;
+                status.textContent="Tap Hear again to try once more.";
+                return;
+              }
+              pass++;
+              if(pass<2)setTimeout(runPass,900);
+              else{
+                partBTest.speaking=false;
+                status.textContent="Now build the sentence. Use 🐢 Hear slowly if any word was unclear.";
+              }
+            }
+          );
+        },300);
       };
-      line.onerror=function(){partBTest.speaking=false;status.textContent="Tap Hear again to try once more."};
+      intro.onerror=function(){partBTest.speaking=false;status.textContent="Tap Hear again to try once more."};
       window.speechSynthesis.speak(intro);
     }
-    speakPass();
+    runPass();
   }catch(e){
     partBTest.speaking=false;
     status.textContent="Tap Hear again to try once more.";
@@ -608,7 +696,7 @@ function loadPartBTestSentence(){
   partBTest.answer="";partBTest.caps=false;
   $("partBTestBadge").textContent="Sentence "+(partBTest.i+1)+" of 8";
   $("partBTestProgress").style.width=((partBTest.i/8)*100)+"%";
-  $("partBTestListenStatus").textContent="Tap Hear sentence. It will be read twice.";
+  $("partBTestListenStatus").textContent="Tap Hear sentence. It will be read twice in clear chunks.";
   $("partBTestFeedback").className="feedback";
   renderPartBPad();
 }
@@ -642,7 +730,8 @@ function renderPartBKeyboard(){
     pad.appendChild(b);
   });
 }
-$("partBTestHear").onclick=function(){speakPartBSentence()};
+$("partBTestHear").onclick=function(){speakPartBSentence(false)};
+$("partBTestHearSlow").onclick=function(){speakPartBSentence(true)};
 $("partBCaps").onclick=function(){partBTest.caps=!partBTest.caps;renderPartBPad()};
 $("partBBack").onclick=function(){partBTest.answer=partBTest.answer.slice(0,-1);renderPartBPad()};
 $("partBClear").onclick=function(){partBTest.answer="";partBTest.caps=false;renderPartBPad()};

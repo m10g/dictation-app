@@ -241,3 +241,5 @@ button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(48,54,81,.12)}
 .voiceButtons .hearBtn{margin:0}
 .slowHearBtn{border:3px solid var(--ink);border-radius:17px;background:#fff2b7;font-weight:950;min-height:54px;font-size:16px;box-shadow:0 4px 0 rgba(48,54,81,.12)}
 @media(max-width:420px){.voiceButtons{grid-template-columns:1fr}.slowHearBtn{min-height:50px}}
+
+.aiVoiceNote{margin-top:8px;padding:8px 10px;border:2px solid #b9d8ef;border-radius:12px;background:#eef8ff;color:#526077;font-size:10px;font-weight:800;line-height:1.45;text-align:center}

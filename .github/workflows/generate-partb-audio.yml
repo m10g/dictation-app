@@ -1,0 +1,80 @@
+name: Generate Part B Dictation Audio
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/generate-partb-audio.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate fixed Apple-voice dictation files
+        shell: bash
+        run: |
+          mkdir -p dictapet/audio/partb
+          python3 <<'PY'
+          import os, re, subprocess
+
+          scripts = [
+              "It's Joe's first day at his new school, full stop.",
+              "It's ten o'clock and the pupils are in the music room, full stop.",
+              "They're playing the recorder, full stop.",
+              "Joe thinks it is difficult to repeat after the teacher, full stop.",
+              "Open quotation mark, Oh, comma, no, exclamation mark, close quotation mark, says Joe, full stop.",
+              "Open quotation mark, I'm in the wrong class, full stop, close quotation mark.",
+              "Joe and the other pupils laugh, full stop.",
+              "Joe goes to his classroom, full stop.",
+          ]
+
+          available = subprocess.check_output(["say", "-v", "?"], text=True)
+          voice_names = []
+          gb_names = []
+          for line in available.splitlines():
+              m = re.match(r"^([^\s]+)\s+([a-z]{2}_[A-Z]{2})\s+", line)
+              if not m:
+                  continue
+              name, locale = m.groups()
+              voice_names.append(name)
+              if locale == "en_GB":
+                  gb_names.append(name)
+
+          preferred = ["Serena", "Kate", "Daniel", "Samantha"]
+          voice = next((v for v in preferred if v in voice_names), None)
+          if not voice:
+              voice = gb_names[0] if gb_names else next((v for v in voice_names if v), "Samantha")
+
+          print("Using macOS voice:", voice)
+
+          for idx, script in enumerate(scripts, 1):
+              full = f"Sentence {idx}. {script} Again. {script}"
+              for mode, rate in [("normal", 155), ("slow", 125)]:
+                  base = f"dictapet/audio/partb/{idx:02d}-{mode}"
+                  aiff = base + ".aiff"
+                  m4a = base + ".m4a"
+                  subprocess.run(["say", "-v", voice, "-r", str(rate), "-o", aiff, full], check=True)
+                  subprocess.run(["afconvert", "-f", "m4af", "-d", "aac", "-b", "96000", aiff, m4a], check=True)
+                  os.remove(aiff)
+
+          with open("dictapet/audio/partb/voice.txt", "w", encoding="utf-8") as f:
+              f.write(voice + "\n")
+          PY
+
+      - name: Commit generated audio
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dictapet/audio/partb
+          if git diff --cached --quiet; then
+            echo "No audio changes."
+          else
+            git commit -m "Add prebuilt Part B dictation audio"
+            git push
+          fi

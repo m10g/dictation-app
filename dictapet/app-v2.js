@@ -140,6 +140,13 @@ function formatTestDate(ts){
 function recentHistory(){
   return Array.isArray(state.vocabTestHistory)?state.vocabTestHistory:[];
 }
+function testMeta(t){
+  const total=t.total||((t.results||[]).length)||10;
+  const maxScore=t.maxScore||(total*3);
+  const score=Number(t.score||0);
+  const pct=maxScore?Math.round((score/maxScore)*100):0;
+  return {total:total,maxScore:maxScore,score:score,pct:pct};
+}
 function renderVocabHistorySummary(){
   const box=$("partAHistorySummary");if(!box)return;
   const h=recentHistory();
@@ -147,18 +154,19 @@ function renderVocabHistorySummary(){
     box.innerHTML='<div class="historyEmpty">No Part A test yet. Aaron’s scores will appear here after each test.</div>';
     return;
   }
-  const latest=h[0],best=Math.max(...h.map(x=>x.score||0));
+  const latest=testMeta(h[0]);
   const last5=h.slice(0,5);
-  const avg=(last5.reduce((s,x)=>s+(x.score||0),0)/last5.length).toFixed(1);
-  const bars=[...last5].reverse().map(x=>`<span class="trendBar" title="${x.score}/30"><i style="height:${Math.max(8,(x.score/30)*100)}%"></i></span>`).join("");
-  box.innerHTML=`
-    <div class="historyStats">
-      <div><b>${latest.score}/30</b><small>Latest</small></div>
-      <div><b>${best}/30</b><small>Best</small></div>
-      <div><b>${avg}/30</b><small>Avg last ${last5.length}</small></div>
-    </div>
-    <div class="trendWrap"><span>Recent</span><div class="trendBars">${bars}</div></div>
-  `;
+  const best=Math.max.apply(null,h.map(function(x){return testMeta(x).pct}));
+  const avg=Math.round(last5.reduce(function(s,x){return s+testMeta(x).pct},0)/last5.length);
+  const bars=last5.slice().reverse().map(function(x){
+    const m=testMeta(x);
+    return '<span class="trendBar" title="'+m.score+'/'+m.maxScore+' ('+m.pct+'%)"><i style="height:'+Math.max(8,m.pct)+'%"></i></span>';
+  }).join("");
+  box.innerHTML='<div class="historyStats">'+
+    '<div><b>'+latest.score+'/'+latest.maxScore+'</b><small>Latest</small></div>'+
+    '<div><b>'+best+'%</b><small>Best</small></div>'+
+    '<div><b>'+avg+'%</b><small>Avg last '+last5.length+'</small></div>'+
+    '</div><div class="trendWrap"><span>Recent</span><div class="trendBars">'+bars+'</div></div>';
 }
 function showVocabHistory(){
   renderVocabHistoryFull();
@@ -171,93 +179,123 @@ function renderVocabHistoryFull(){
     list.innerHTML="";
     return;
   }
-  const best=Math.max(...h.map(x=>x.score||0));
-  const avg=(h.reduce((s,x)=>s+(x.score||0),0)/h.length).toFixed(1);
-  summary.innerHTML=`<b>${h.length} test${h.length===1?"":"s"}</b> • Best ${best}/30 • Overall average ${avg}/30`;
-  list.innerHTML=h.map((t,n)=>{
-    const missed=(t.results||[]).filter(r=>!r.correct).map(r=>r.word);
-    return `<div class="historyRow">
-      <div class="historyScore ${t.score>=27?"great":t.score>=21?"ok":"needs"}">${t.score}<span>/30</span></div>
-      <div class="historyDetails"><b>${formatTestDate(t.ts)}</b><small>${t.correctCount}/10 exact</small>
-      <div class="missedWords">${missed.length?"Review: "+missed.join(", "):"Perfect — no words missed 🎉"}</div></div>
-    </div>`;
+  const best=Math.max.apply(null,h.map(function(x){return testMeta(x).pct}));
+  const avg=Math.round(h.reduce(function(s,x){return s+testMeta(x).pct},0)/h.length);
+  summary.innerHTML='<b>'+h.length+' test'+(h.length===1?'':'s')+'</b> • Best '+best+'% • Overall average '+avg+'%';
+  list.innerHTML=h.map(function(t){
+    const m=testMeta(t);
+    const missed=(t.results||[]).filter(function(r){return !r.correct}).map(function(r){return r.word});
+    return '<div class="historyRow">'+
+      '<div class="historyScore '+(m.pct>=90?'great':m.pct>=70?'ok':'needs')+'">'+m.score+'<span>/'+m.maxScore+'</span></div>'+
+      '<div class="historyDetails"><b>'+formatTestDate(t.ts)+'</b><small>'+t.correctCount+'/'+m.total+' exact • '+m.pct+'%</small>'+
+      '<div class="missedWords">'+(missed.length?'Review: '+missed.join(', '):'Perfect — no words missed 🎉')+'</div></div></div>';
   }).join("");
 }
+function speakVocabTestWord(){
+  const item=VOCAB[vocabTest.items[vocabTest.i]];
+  const status=$("vocabTestListenStatus");
+  if(!item)return;
+  if(!("speechSynthesis" in window)){
+    status.textContent="Audio is not available on this browser.";
+    return;
+  }
+  try{
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(item.word);
+    u.lang="en-GB";u.rate=.78;u.pitch=1;
+    u.onstart=function(){status.textContent="Listen carefully… 🔊"};
+    u.onend=function(){status.textContent="Tap 🔊 Hear word if you want to hear it again."};
+    u.onerror=function(){status.textContent="Tap 🔊 Hear word to try again."};
+    window.speechSynthesis.speak(u);
+  }catch(e){
+    status.textContent="Tap 🔊 Hear word to try again.";
+  }
+}
 function startVocabTest(){
-  vocabTest={i:0,items:shuffle(VOCAB.map((_,i)=>i)).slice(0,10),answer:"",results:[],locked:false};
+  vocabTest={i:0,items:shuffle(VOCAB.map(function(_,i){return i})),answer:"",results:[],locked:false};
   showView("vocabTest");
   later(loadVocabTest,250);
 }
 function loadVocabTest(){
   vocabTest.answer="";vocabTest.locked=false;
-  const item=VOCAB[vocabTest.items[vocabTest.i]];
-  $("vocabTestBadge").textContent=`Question ${vocabTest.i+1} of 10`;
-  $("vocabTestProgress").style.width=`${(vocabTest.i/10)*100}%`;
-  $("vocabTestPrompt").innerHTML=`<span class="testIcon">${item.icon}</span><b>${item.hint}</b>`;
-  $("vocabTestAnswer").textContent="Tap letters below";
-  $("vocabTestAnswer").className="testAnswer empty";
+  $("vocabTestBadge").textContent="Word "+(vocabTest.i+1)+" of 12";
+  $("vocabTestProgress").style.width=((vocabTest.i/12)*100)+"%";
+  $("vocabTestPrompt").innerHTML='<span class="testEar">🔊</span><b>Listen to the word</b><span class="tiny">Spell exactly what you hear.</span>';
+  $("vocabTestListenStatus").textContent="Tap 🔊 Hear word if you want to hear it again.";
   $("vocabTestFeedback").className="feedback";
   renderAlphabetPad();
+  renderVocabTestAnswer();
+  later(speakVocabTestWord,220);
 }
 function renderAlphabetPad(){
   const pad=$("alphabetPad");pad.innerHTML="";
-  "abcdefghijklmnopqrstuvwxyz".split("").forEach(ch=>{
+  "abcdefghijklmnopqrstuvwxyz".split("").forEach(function(ch){
     const b=document.createElement("button");b.className="alphaKey";b.textContent=ch;
-    b.onclick=()=>{if(vocabTest.locked)return;vocabTest.answer+=ch;renderVocabTestAnswer()};
+    b.onclick=function(){if(vocabTest.locked)return;vocabTest.answer+=ch;renderVocabTestAnswer()};
     pad.appendChild(b);
   });
   const space=document.createElement("button");space.className="alphaKey wide";space.textContent="space";
-  space.onclick=()=>{if(vocabTest.locked||!vocabTest.answer||vocabTest.answer.endsWith(" "))return;vocabTest.answer+=" ";renderVocabTestAnswer()};
+  space.onclick=function(){
+    if(vocabTest.locked||!vocabTest.answer||vocabTest.answer.endsWith(" "))return;
+    vocabTest.answer+=" ";renderVocabTestAnswer();
+  };
   pad.appendChild(space);
 }
 function renderVocabTestAnswer(){
   const el=$("vocabTestAnswer");
-  el.textContent=vocabTest.answer||"Tap letters below";
-  el.className="testAnswer"+(vocabTest.answer?"":" empty");
+  if(!vocabTest.answer){
+    el.innerHTML='<span class="testPlaceholder">Tap letters below</span>';
+    return;
+  }
+  const words=vocabTest.answer.split(" ");
+  el.innerHTML=words.map(function(word){
+    return '<span class="wordGroup">'+word.split("").map(function(ch){return '<span class="letterSlot">'+ch+'</span>'}).join("")+'</span>';
+  }).join('<span class="spaceGap"></span>');
 }
-$("vocabTestBack").onclick=()=>{if(vocabTest.locked)return;vocabTest.answer=vocabTest.answer.slice(0,-1);renderVocabTestAnswer()};
-$("vocabTestClear").onclick=()=>{if(vocabTest.locked)return;vocabTest.answer="";renderVocabTestAnswer()};
-$("vocabTestSubmit").onclick=()=>{
+$("vocabTestHear").onclick=function(){if(!vocabTest.locked)speakVocabTestWord()};
+$("vocabTestBack").onclick=function(){if(vocabTest.locked)return;vocabTest.answer=vocabTest.answer.slice(0,-1);renderVocabTestAnswer()};
+$("vocabTestClear").onclick=function(){if(vocabTest.locked)return;vocabTest.answer="";renderVocabTestAnswer()};
+$("vocabTestSubmit").onclick=function(){
   if(vocabTest.locked||!vocabTest.answer.trim()){
-    const f=$("vocabTestFeedback");f.className="feedback try show";f.innerHTML="<b>Enter an answer first.</b>";
+    const f=$("vocabTestFeedback");f.className="feedback try show";f.innerHTML="<b>Spell the word first.</b>";
     return;
   }
   vocabTest.locked=true;
+  try{if("speechSynthesis" in window)window.speechSynthesis.cancel()}catch(e){}
   const item=VOCAB[vocabTest.items[vocabTest.i]];
   const answer=vocabTest.answer.trim().replace(/\s+/g," ");
   const correct=answer===item.word;
-  vocabTest.results.push({word:item.word,answer,correct});
+  vocabTest.results.push({word:item.word,answer:answer,correct:correct});
   const f=$("vocabTestFeedback");
   f.className="feedback good show";
-  f.innerHTML="<b>Answer locked ✓</b> Score stays hidden until the end.";
-  later(()=>{
+  f.innerHTML="<b>Done ✓</b> Next word…";
+  later(function(){
     vocabTest.i++;
-    if(vocabTest.i>=10)finishVocabTest();
+    if(vocabTest.i>=12)finishVocabTest();
     else animateSwap("vocabTestCard",loadVocabTest);
-  },650);
+  },520);
 };
 function finishVocabTest(){
-  const correctCount=vocabTest.results.filter(r=>r.correct).length;
+  const correctCount=vocabTest.results.filter(function(r){return r.correct}).length;
   const score=correctCount*3;
-  const record={ts:Date.now(),score,correctCount,results:vocabTest.results};
+  const record={ts:Date.now(),score:score,maxScore:36,total:12,correctCount:correctCount,results:vocabTest.results};
   if(!Array.isArray(state.vocabTestHistory))state.vocabTestHistory=[];
   state.vocabTestHistory.unshift(record);
   if(state.vocabTestHistory.length>100)state.vocabTestHistory=state.vocabTestHistory.slice(0,100);
   state.stars+=Math.max(1,correctCount);
-  if(score===30)state.snacks+=3;
+  if(score===36)state.snacks+=3;
   save();
-  $("vocabResultScore").textContent=`${score}/30`;
-  $("vocabResultMsg").textContent=score===30?"Perfect Part A test! 🏆":score>=27?"Excellent — almost perfect. 🌟":score>=21?"Good progress — review the missed words. 💪":"Keep practising the missed words, then try another test. 📚";
-  $("vocabResultList").innerHTML=vocabTest.results.map(r=>`<div class="testResultRow ${r.correct?"correct":"wrong"}">
-    <span>${r.correct?"✅":"❌"}</span>
-    <div><b>${r.word}</b>${r.correct?"":`<small>Aaron entered: ${r.answer||"—"}</small>`}</div>
-    <strong>${r.correct?"+3":"+0"}</strong>
-  </div>`).join("");
+  $("vocabResultScore").textContent=score+"/36";
+  $("vocabResultCount").textContent=correctCount+"/12 words exact";
+  $("vocabResultMsg").textContent=score===36?"Perfect Part A test! 🏆":score>=33?"Excellent — almost perfect. 🌟":score>=27?"Good progress — review the missed words. 💪":"Keep practising the missed words, then try another test. 📚";
+  $("vocabResultList").innerHTML=vocabTest.results.map(function(r){
+    return '<div class="testResultRow '+(r.correct?'correct':'wrong')+'"><span>'+(r.correct?'✅':'❌')+'</span><div><b>'+r.word+'</b>'+(r.correct?'':'<small>Aaron entered: '+(r.answer||'—')+'</small>')+'</div><strong>'+(r.correct?'+3':'+0')+'</strong></div>';
+  }).join("");
   showView("vocabResult");
-  later(()=>celebrate("vocabResultPet",correctCount,score===30),300);
+  later(function(){celebrate("vocabResultPet",correctCount,score===36)},300);
 }
-$("vocabTestAgain").onclick=()=>startVocabTest();
-$("vocabResultHistory").onclick=()=>showVocabHistory();
+$("vocabTestAgain").onclick=function(){startVocabTest()};
+$("vocabResultHistory").onclick=function(){showVocabHistory()};
 
 function startVocab(){
   vocab={i:0,selected:[],order:[],locked:false};

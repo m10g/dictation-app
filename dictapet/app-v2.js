@@ -573,15 +573,25 @@ function stopPartBSpeech(){
   try{if("speechSynthesis" in window)window.speechSynthesis.cancel()}catch(e){}
   partBTest.speaking=false;
 }
-function partBVoiceChunks(i){
+function partBNaturalChunks(i){
   if(i===0)return ["It’s Joe’s first day","at his new school."];
   if(i===1)return ["It’s ten o’clock","and the pupils are","in the music room."];
   if(i===2)return ["They’re playing","the recorder."];
   if(i===3)return ["Joe thinks it is difficult","to repeat","after the teacher."];
-  if(i===4)return ["Open quotation mark","Oh, no!","Close quotation mark","says Joe."];
-  if(i===5)return ["Open quotation mark","I’m in the wrong class.","Close quotation mark"];
+  if(i===4)return ["Oh, no!","says Joe."];
+  if(i===5)return ["I’m in the wrong class."];
   if(i===6)return ["Joe and the other pupils","laugh."];
   return ["Joe goes","to his classroom."];
+}
+function partBPunctuationChunks(i){
+  if(i===0)return ["It’s Joe’s first day at his new school","full stop","apostrophe in It’s","apostrophe in Joe’s"];
+  if(i===1)return ["It’s ten o’clock and the pupils are in the music room","full stop","apostrophe in It’s","apostrophe in o’clock"];
+  if(i===2)return ["They’re playing the recorder","full stop","apostrophe in They’re"];
+  if(i===3)return ["Joe thinks it is difficult to repeat after the teacher","full stop"];
+  if(i===4)return ["open quotation mark","Oh","comma","no","exclamation mark","close quotation mark","says Joe","full stop"];
+  if(i===5)return ["open quotation mark","I’m in the wrong class","full stop","close quotation mark","apostrophe in I’m"];
+  if(i===6)return ["Joe and the other pupils laugh","full stop"];
+  return ["Joe goes to his classroom","full stop"];
 }
 function speakUtteranceSequence(parts,rate,gap,onStatus,onDone){
   let k=0;
@@ -605,18 +615,20 @@ function speakPartBSentence(slowMode){
   partBTest.speaking=true;
   try{
     window.speechSynthesis.cancel();
-    const chunks=partBVoiceChunks(partBTest.i);
     let pass=0;
     function runPass(){
-      const label=pass===0?"First reading":"Second reading";
-      const intro=makeClearUtterance(pass===0?"Sentence "+(partBTest.i+1)+".":"Again.",.72);
+      const punctuationPass=pass===1;
+      const label=punctuationPass?"Second reading • punctuation":"First reading • natural";
+      const introText=pass===0?"Sentence "+(partBTest.i+1)+".":"Again, with punctuation.";
+      const intro=makeClearUtterance(introText,.72);
       intro.onstart=function(){status.textContent=label+"… 🔊"};
       intro.onend=function(){
         setTimeout(function(){
+          const chunks=punctuationPass?partBPunctuationChunks(partBTest.i):partBNaturalChunks(partBTest.i);
           speakUtteranceSequence(
             chunks,
-            slowMode?.52:(pass===0?.64:.58),
-            slowMode?520:360,
+            slowMode?.52:(punctuationPass?.56:.64),
+            slowMode?560:(punctuationPass?480:360),
             function(k,total){
               status.textContent=label+" • part "+(k+1)+" of "+total+" 🔊";
             },
@@ -630,7 +642,7 @@ function speakPartBSentence(slowMode){
               if(pass<2)setTimeout(runPass,900);
               else{
                 partBTest.speaking=false;
-                status.textContent="Now build the sentence. Use 🐢 Hear slowly if any word was unclear.";
+                status.textContent="Now build the sentence. The second reading included the punctuation.";
               }
             }
           );
@@ -696,7 +708,7 @@ function loadPartBTestSentence(){
   partBTest.answer="";partBTest.caps=false;
   $("partBTestBadge").textContent="Sentence "+(partBTest.i+1)+" of 8";
   $("partBTestProgress").style.width=((partBTest.i/8)*100)+"%";
-  $("partBTestListenStatus").textContent="Tap Hear sentence. It will be read twice in clear chunks.";
+  $("partBTestListenStatus").textContent="First reading is natural. Second reading says the punctuation aloud.";
   $("partBTestFeedback").className="feedback";
   renderPartBPad();
 }

@@ -61,7 +61,7 @@ try{
   }
 }catch(e){}
 
-let activeView="home", timers=[], vocab={i:0,selected:[],order:[],locked:false}, vocabTest={i:0,items:[],answer:"",results:[],locked:false}, partBTest={i:0,answer:"",caps:false,results:[],speaking:false}, builder={i:0,round:"chunks",selected:[],order:[]}, spell={i:0,selected:[],order:[]}, detective={i:0,locked:false}, boss={i:0};
+let activeView="home", timers=[], vocab={i:0,selected:[],order:[],locked:false}, vocabTest={i:0,items:[],answer:"",results:[],locked:false}, partBTest={i:0,answer:"",caps:false,results:[],speaking:false}, builder={i:0,round:"chunks",selected:[],order:[]}, spell={i:0,selected:[],order:[]}, detective={i:0,locked:false}, boss={i:0}, writtenDictation={i:0,done:[]};
 
 function save(){
   try{localStorage.setItem("dictapetStateV2",JSON.stringify(state))}catch(e){}
@@ -130,6 +130,7 @@ $("builderMode").onclick=()=>startBuilder();
 $("spellMode").onclick=()=>startSpell();
 $("detectiveMode").onclick=()=>startDetective();
 $("bossMode").onclick=()=>startBoss();
+$("writtenDictationMode").onclick=()=>startWrittenDictation();
 $("partBTestMode").onclick=()=>startPartBTest();
 $("partBHistoryMode").onclick=()=>showPartBHistory();
 
@@ -867,6 +868,110 @@ function chooseDetective(btn,correct){
     later(()=>btn.classList.remove("wrong"),500)
   }
 }
+
+
+/* PART B WRITTEN DICTATION — PAPER + JUMPABLE SENTENCES */
+function stopWrittenDictationAudio(){
+  if(partBFixedAudio){
+    try{partBFixedAudio.pause();partBFixedAudio.src=""}catch(e){}
+    partBFixedAudio=null;
+  }
+}
+function startWrittenDictation(){
+  stopPartBSpeech();
+  writtenDictation={i:0,done:[]};
+  showView("writtenDictation");
+  later(loadWrittenDictation,220);
+}
+function renderWrittenSentenceNav(){
+  const nav=$("writtenSentenceNav");
+  nav.innerHTML="";
+  for(let n=0;n<8;n++){
+    const b=document.createElement("button");
+    b.className="sentenceJump "+(n===writtenDictation.i?"current ":"")+(writtenDictation.done.includes(n)?"done":"");
+    b.innerHTML="<span>"+(n+1)+"</span>"+(writtenDictation.done.includes(n)?"✓":"");
+    b.onclick=function(){goWrittenSentence(n)};
+    nav.appendChild(b);
+  }
+}
+function loadWrittenDictation(){
+  stopWrittenDictationAudio();
+  $("writtenBadge").textContent="Sentence "+(writtenDictation.i+1)+" of 8";
+  $("writtenProgress").style.width=((writtenDictation.done.length/8)*100)+"%";
+  $("writtenStatus").textContent="Tap Hear sentence, then write it on paper.";
+  $("writtenReveal").className="reveal";
+  $("writtenReveal").textContent="";
+  $("writtenCheckBtn").textContent="Check answer 👀";
+  $("writtenDoneBtn").textContent=writtenDictation.done.includes(writtenDictation.i)?"Done ✓":"I’ve written it ✓";
+  $("writtenPrev").disabled=writtenDictation.i===0;
+  $("writtenNext").disabled=writtenDictation.i===7;
+  renderWrittenSentenceNav();
+}
+function goWrittenSentence(n){
+  if(n<0||n>7||n===writtenDictation.i)return;
+  stopWrittenDictationAudio();
+  writtenDictation.i=n;
+  animateSwap("writtenDictationCard",loadWrittenDictation);
+}
+function playWrittenDictationAudio(slowMode){
+  if(partBFixedAudio)return;
+  const status=$("writtenStatus");
+  try{
+    const audio=new Audio(partBAudioUrl(writtenDictation.i,slowMode));
+    partBFixedAudio=audio;
+    audio.preload="auto";
+    audio.onplaying=function(){status.textContent=(slowMode?"Slow":"Clear")+" dictation recording… 🔊"};
+    audio.onended=function(){
+      if(partBFixedAudio===audio)partBFixedAudio=null;
+      status.textContent="Now write the sentence. Replay it as many times as you need.";
+    };
+    audio.onerror=function(){
+      if(partBFixedAudio===audio)partBFixedAudio=null;
+      status.textContent="Recording could not load. Try again.";
+    };
+    const p=audio.play();
+    if(p&&p.catch)p.catch(function(){
+      if(partBFixedAudio===audio)partBFixedAudio=null;
+      status.textContent="Tap Hear sentence to try again.";
+    });
+  }catch(e){
+    if(partBFixedAudio)partBFixedAudio=null;
+    status.textContent="Tap Hear sentence to try again.";
+  }
+}
+$("writtenHear").onclick=function(){playWrittenDictationAudio(false)};
+$("writtenHearSlow").onclick=function(){playWrittenDictationAudio(true)};
+$("writtenPrev").onclick=function(){goWrittenSentence(writtenDictation.i-1)};
+$("writtenNext").onclick=function(){goWrittenSentence(writtenDictation.i+1)};
+$("writtenDoneBtn").onclick=function(){
+  if(!writtenDictation.done.includes(writtenDictation.i)){
+    writtenDictation.done.push(writtenDictation.i);
+    writtenDictation.done.sort(function(a,b){return a-b});
+  }
+  $("writtenProgress").style.width=((writtenDictation.done.length/8)*100)+"%";
+  $("writtenDoneBtn").textContent="Done ✓";
+  renderWrittenSentenceNav();
+  if(writtenDictation.done.length===8){
+    $("writtenStatus").textContent="All 8 sentences completed! 🎉 You can still jump back to any sentence.";
+    celebrate("homePet",2,true);
+  }else{
+    $("writtenStatus").textContent="Marked done. Choose another sentence or tap Next.";
+  }
+};
+$("writtenCheckBtn").onclick=function(){
+  const box=$("writtenReveal");
+  const showing=box.classList.contains("show");
+  if(showing){
+    box.className="reveal";
+    box.textContent="";
+    $("writtenCheckBtn").textContent="Check answer 👀";
+  }else{
+    box.textContent=SENTENCES[writtenDictation.i].text;
+    box.className="reveal show";
+    $("writtenCheckBtn").textContent="Hide answer 🙈";
+  }
+};
+$("writtenDictationHome").onclick=function(){stopWrittenDictationAudio();showView("home")};
 
 function startBoss(){boss={i:0};showView("boss");later(loadBoss,250)}
 function loadBoss(){

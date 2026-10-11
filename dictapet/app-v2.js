@@ -51,7 +51,7 @@ const DETECTIVE = [
 const PET_EMOJI={Pipo:"🐣",Mimi:"🐰",Toto:"🐭",Bibi:"🐸"};
 const $=id=>document.getElementById(id);
 
-let state={pet:"Pipo",color:"#ffe07a",stars:0,snacks:0,vocabDone:[],builderDone:[],spellDone:[],detectiveDone:[],bossDone:[],preview:6};
+let state={pet:"Pipo",color:"#ffe07a",stars:0,snacks:0,vocabDone:[],vocabTestHistory:[],builderDone:[],spellDone:[],detectiveDone:[],bossDone:[],preview:6};
 try{
   const saved=JSON.parse(localStorage.getItem("dictapetStateV2")||"null");
   if(saved) state={...state,...saved};
@@ -61,7 +61,7 @@ try{
   }
 }catch(e){}
 
-let activeView="home", timers=[], vocab={i:0,selected:[],order:[],locked:false}, builder={i:0,round:"chunks",selected:[],order:[]}, spell={i:0,selected:[],order:[]}, detective={i:0,locked:false}, boss={i:0};
+let activeView="home", timers=[], vocab={i:0,selected:[],order:[],locked:false}, vocabTest={i:0,items:[],answer:"",results:[],locked:false}, builder={i:0,round:"chunks",selected:[],order:[]}, spell={i:0,selected:[],order:[]}, detective={i:0,locked:false}, boss={i:0};
 
 function save(){
   try{localStorage.setItem("dictapetStateV2",JSON.stringify(state))}catch(e){}
@@ -74,6 +74,7 @@ function sync(){
   document.querySelectorAll(".pet").forEach(p=>p.style.setProperty("--pet",state.color));
   document.querySelectorAll(".petbtn").forEach(b=>b.classList.toggle("sel",b.dataset.name===state.pet));
   ["builderJourneyPet","spellJourneyPet","detectiveJourneyPet","bossJourneyPet"].forEach(id=>{const el=$(id);if(el)el.textContent=PET_EMOJI[state.pet]||"🐣"});
+  if($("partAHistorySummary"))renderVocabHistorySummary();
 }
 function showView(id){
   clearTimers();
@@ -122,11 +123,141 @@ function startCountdown(memoryId,timerId,text,seconds,onDone){
 document.querySelectorAll(".petbtn").forEach(b=>b.onclick=()=>{state.pet=b.dataset.name;state.color=b.dataset.color;save();$("homeSpeech").textContent=`${state.pet} is ready! ✨`});
 $("startBest").onclick=()=>startVocab();
 $("vocabMode").onclick=()=>startVocab();
+$("vocabTestMode").onclick=()=>startVocabTest();
+$("vocabHistoryMode").onclick=()=>showVocabHistory();
 $("builderMode").onclick=()=>startBuilder();
 $("spellMode").onclick=()=>startSpell();
 $("detectiveMode").onclick=()=>startDetective();
 $("bossMode").onclick=()=>startBoss();
 
+
+
+/* PART A TEST + SCORE HISTORY */
+function formatTestDate(ts){
+  try{return new Date(ts).toLocaleString([], {month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"})}
+  catch(e){return new Date(ts).toLocaleString()}
+}
+function recentHistory(){
+  return Array.isArray(state.vocabTestHistory)?state.vocabTestHistory:[];
+}
+function renderVocabHistorySummary(){
+  const box=$("partAHistorySummary");if(!box)return;
+  const h=recentHistory();
+  if(!h.length){
+    box.innerHTML='<div class="historyEmpty">No Part A test yet. Aaron’s scores will appear here after each test.</div>';
+    return;
+  }
+  const latest=h[0],best=Math.max(...h.map(x=>x.score||0));
+  const last5=h.slice(0,5);
+  const avg=(last5.reduce((s,x)=>s+(x.score||0),0)/last5.length).toFixed(1);
+  const bars=[...last5].reverse().map(x=>`<span class="trendBar" title="${x.score}/30"><i style="height:${Math.max(8,(x.score/30)*100)}%"></i></span>`).join("");
+  box.innerHTML=`
+    <div class="historyStats">
+      <div><b>${latest.score}/30</b><small>Latest</small></div>
+      <div><b>${best}/30</b><small>Best</small></div>
+      <div><b>${avg}/30</b><small>Avg last ${last5.length}</small></div>
+    </div>
+    <div class="trendWrap"><span>Recent</span><div class="trendBars">${bars}</div></div>
+  `;
+}
+function showVocabHistory(){
+  renderVocabHistoryFull();
+  showView("vocabHistory");
+}
+function renderVocabHistoryFull(){
+  const h=recentHistory(),list=$("vocabHistoryList"),summary=$("vocabHistoryTop");
+  if(!h.length){
+    summary.innerHTML='<b>No tests yet.</b> Complete a Part A Test and the result will be saved automatically.';
+    list.innerHTML="";
+    return;
+  }
+  const best=Math.max(...h.map(x=>x.score||0));
+  const avg=(h.reduce((s,x)=>s+(x.score||0),0)/h.length).toFixed(1);
+  summary.innerHTML=`<b>${h.length} test${h.length===1?"":"s"}</b> • Best ${best}/30 • Overall average ${avg}/30`;
+  list.innerHTML=h.map((t,n)=>{
+    const missed=(t.results||[]).filter(r=>!r.correct).map(r=>r.word);
+    return `<div class="historyRow">
+      <div class="historyScore ${t.score>=27?"great":t.score>=21?"ok":"needs"}">${t.score}<span>/30</span></div>
+      <div class="historyDetails"><b>${formatTestDate(t.ts)}</b><small>${t.correctCount}/10 exact</small>
+      <div class="missedWords">${missed.length?"Review: "+missed.join(", "):"Perfect — no words missed 🎉"}</div></div>
+    </div>`;
+  }).join("");
+}
+function startVocabTest(){
+  vocabTest={i:0,items:shuffle(VOCAB.map((_,i)=>i)).slice(0,10),answer:"",results:[],locked:false};
+  showView("vocabTest");
+  later(loadVocabTest,250);
+}
+function loadVocabTest(){
+  vocabTest.answer="";vocabTest.locked=false;
+  const item=VOCAB[vocabTest.items[vocabTest.i]];
+  $("vocabTestBadge").textContent=`Question ${vocabTest.i+1} of 10`;
+  $("vocabTestProgress").style.width=`${(vocabTest.i/10)*100}%`;
+  $("vocabTestPrompt").innerHTML=`<span class="testIcon">${item.icon}</span><b>${item.hint}</b>`;
+  $("vocabTestAnswer").textContent="Tap letters below";
+  $("vocabTestAnswer").className="testAnswer empty";
+  $("vocabTestFeedback").className="feedback";
+  renderAlphabetPad();
+}
+function renderAlphabetPad(){
+  const pad=$("alphabetPad");pad.innerHTML="";
+  "abcdefghijklmnopqrstuvwxyz".split("").forEach(ch=>{
+    const b=document.createElement("button");b.className="alphaKey";b.textContent=ch;
+    b.onclick=()=>{if(vocabTest.locked)return;vocabTest.answer+=ch;renderVocabTestAnswer()};
+    pad.appendChild(b);
+  });
+  const space=document.createElement("button");space.className="alphaKey wide";space.textContent="space";
+  space.onclick=()=>{if(vocabTest.locked||!vocabTest.answer||vocabTest.answer.endsWith(" "))return;vocabTest.answer+=" ";renderVocabTestAnswer()};
+  pad.appendChild(space);
+}
+function renderVocabTestAnswer(){
+  const el=$("vocabTestAnswer");
+  el.textContent=vocabTest.answer||"Tap letters below";
+  el.className="testAnswer"+(vocabTest.answer?"":" empty");
+}
+$("vocabTestBack").onclick=()=>{if(vocabTest.locked)return;vocabTest.answer=vocabTest.answer.slice(0,-1);renderVocabTestAnswer()};
+$("vocabTestClear").onclick=()=>{if(vocabTest.locked)return;vocabTest.answer="";renderVocabTestAnswer()};
+$("vocabTestSubmit").onclick=()=>{
+  if(vocabTest.locked||!vocabTest.answer.trim()){
+    const f=$("vocabTestFeedback");f.className="feedback try show";f.innerHTML="<b>Enter an answer first.</b>";
+    return;
+  }
+  vocabTest.locked=true;
+  const item=VOCAB[vocabTest.items[vocabTest.i]];
+  const answer=vocabTest.answer.trim().replace(/\s+/g," ");
+  const correct=answer===item.word;
+  vocabTest.results.push({word:item.word,answer,correct});
+  const f=$("vocabTestFeedback");
+  f.className="feedback good show";
+  f.innerHTML="<b>Answer locked ✓</b> Score stays hidden until the end.";
+  later(()=>{
+    vocabTest.i++;
+    if(vocabTest.i>=10)finishVocabTest();
+    else animateSwap("vocabTestCard",loadVocabTest);
+  },650);
+};
+function finishVocabTest(){
+  const correctCount=vocabTest.results.filter(r=>r.correct).length;
+  const score=correctCount*3;
+  const record={ts:Date.now(),score,correctCount,results:vocabTest.results};
+  if(!Array.isArray(state.vocabTestHistory))state.vocabTestHistory=[];
+  state.vocabTestHistory.unshift(record);
+  if(state.vocabTestHistory.length>100)state.vocabTestHistory=state.vocabTestHistory.slice(0,100);
+  state.stars+=Math.max(1,correctCount);
+  if(score===30)state.snacks+=3;
+  save();
+  $("vocabResultScore").textContent=`${score}/30`;
+  $("vocabResultMsg").textContent=score===30?"Perfect Part A test! 🏆":score>=27?"Excellent — almost perfect. 🌟":score>=21?"Good progress — review the missed words. 💪":"Keep practising the missed words, then try another test. 📚";
+  $("vocabResultList").innerHTML=vocabTest.results.map(r=>`<div class="testResultRow ${r.correct?"correct":"wrong"}">
+    <span>${r.correct?"✅":"❌"}</span>
+    <div><b>${r.word}</b>${r.correct?"":`<small>Aaron entered: ${r.answer||"—"}</small>`}</div>
+    <strong>${r.correct?"+3":"+0"}</strong>
+  </div>`).join("");
+  showView("vocabResult");
+  later(()=>celebrate("vocabResultPet",correctCount,score===30),300);
+}
+$("vocabTestAgain").onclick=()=>startVocabTest();
+$("vocabResultHistory").onclick=()=>showVocabHistory();
 
 function startVocab(){
   vocab={i:0,selected:[],order:[],locked:false};

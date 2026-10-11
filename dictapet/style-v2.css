@@ -235,3 +235,9 @@ button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(48,54,81,.12)}
   .partBTools{grid-template-columns:repeat(4,1fr)}
   .partBEditRow{grid-template-columns:1fr 1.4fr}.partBEditRow #partBClear{grid-column:1/3}
 }
+
+
+.voiceButtons{display:grid;grid-template-columns:1.35fr 1fr;gap:8px;margin-top:12px}
+.voiceButtons .hearBtn{margin:0}
+.slowHearBtn{border:3px solid var(--ink);border-radius:17px;background:#fff2b7;font-weight:950;min-height:54px;font-size:16px;box-shadow:0 4px 0 rgba(48,54,81,.12)}
+@media(max-width:420px){.voiceButtons{grid-template-columns:1fr}.slowHearBtn{min-height:50px}}

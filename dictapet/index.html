@@ -221,6 +221,36 @@ button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(48,54,81,.12)}
 .bHistorySentence b{display:block;font-size:12px;line-height:1.35}.bHistorySentence small{display:block;font-size:10px;color:#777d90;margin-top:3px}
 .bHistorySentence strong{font-size:13px}
 
+
+.sentencePad{margin-top:13px;border:3px solid var(--ink);border-radius:20px;background:#fffdf4;padding:11px}
+.sentencePadLabel{font-size:11px;font-weight:950;color:#6f768a;margin-bottom:8px}
+.sentenceBubbles{min-height:88px;display:flex;gap:7px;flex-wrap:wrap;align-content:flex-start;align-items:flex-start}
+.sentencePlaceholder{color:#969bad;font-size:14px;font-weight:800;margin:auto}
+.sentenceBubble{border:2px solid var(--ink);border-radius:11px;background:#fff;padding:7px 9px;font-size:17px;font-weight:900;overflow-wrap:anywhere;max-width:100%}
+.sentenceBubble.current{background:#fff2b7;box-shadow:0 0 0 3px rgba(255,216,107,.35)}
+.sentenceBubble.emptyBubble{min-width:42px;text-align:center;color:#9a8142}
+.partBTools{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:12px}
+.toolKey{min-height:45px;border:2px solid var(--ink);border-radius:12px;background:#eef7ff;font-size:21px;font-weight:950;box-shadow:0 3px 0 rgba(48,54,81,.10)}
+.toolKey.capsKey{font-size:13px;background:#fff4bd}.toolKey.capsKey.on{background:var(--yellow);outline:3px solid #ffe69b}
+.partBAlphabet{margin-top:8px}
+.partBEditRow{display:grid;grid-template-columns:1fr 1.35fr 1fr;gap:7px;margin-top:10px}
+.nextWordBtn{border:3px solid var(--ink);border-radius:17px;background:#dff3ff;font-weight:950;min-height:48px;box-shadow:0 4px 0 rgba(48,54,81,.12)}
+.touchHint{text-align:center;margin-top:9px;line-height:1.4}
+.bResultCompare,.bHistoryAnswer{border:2px solid var(--line);border-radius:15px;padding:11px;margin-top:9px;background:#fff}
+.bResultCompare.correct,.bHistoryAnswer.perfect{background:#eefaf3}
+.bResultCompare.wrong,.bHistoryAnswer.review{background:#fff0ef}
+.bResultHead,.bHistoryTop{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}
+.compareLine{border-radius:10px;background:rgba(255,255,255,.72);padding:8px;margin-top:6px}
+.compareLine.correctLine{background:#edf7ff}
+.compareLine small{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#747b90;margin-bottom:2px}
+.compareLine b{display:block;font-size:14px;line-height:1.35;overflow-wrap:anywhere}
+.errorTags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.errorTags span{font-size:10px;font-weight:900;border:1.5px solid #d58a82;border-radius:999px;background:#fff;padding:3px 7px}
+@media(max-width:480px){
+  .partBTools{grid-template-columns:repeat(4,1fr)}
+  .partBEditRow{grid-template-columns:1fr 1.4fr}.partBEditRow #partBClear{grid-column:1/3}
+}
+
 </style>
 <script>document.documentElement.dataset.jsboot="1";</script>
 </head>
@@ -287,7 +317,7 @@ button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(48,54,81,.12)}
       </div>
       <div class="partBTestBox">
         <h3>📝 Part B Test</h3>
-        <p class="sub">Real-dictation style: hear each sentence, write it on paper, then parent-mark spelling and punctuation at the end.</p>
+        <p class="sub">Fully in-app dictation: hear each sentence, build it with large touch letters and punctuation, then get an automatic score and saved history.</p>
         <div class="btnrow">
           <button class="testBtn" id="partBTestMode">Start Part B Test • /60</button>
           <button class="secondary" id="partBHistoryMode">📈 Part B score history</button>
@@ -387,44 +417,40 @@ button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(48,54,81,.12)}
   <section id="partBTest" class="view">
     <div class="card">
       <span class="badge">Part B Test • 8 sentences • 60 marks</span>
-      <h3>📝 Paper Dictation Test</h3>
-      <p class="sub">Keep the answer hidden. Hear each sentence twice, write it on paper, then tap <b>Done ✅</b>.</p>
+      <h3>📝 In-App Dictation Test</h3>
+      <p class="sub">Hear each sentence twice, then build it using the large touch pad. No keyboard, autocorrect, answer hints or right/wrong feedback during the test.</p>
       <div class="progressline"><div id="partBTestProgress"></div></div>
     </div>
     <div class="card challenge" id="partBTestCard">
       <span class="badge" id="partBTestBadge">Sentence 1 of 8</span>
-      <div class="testPrompt partBListenPrompt"><span class="testEar">🎧</span><b>Listen. Then write on paper.</b><span class="tiny">Quotation marks are spoken aloud for the dialogue sentences.</span></div>
+      <div class="testPrompt partBListenPrompt"><span class="testEar">🎧</span><b>Listen carefully</b><span class="tiny">For dialogue, the app says open quotation mark and close quotation mark.</span></div>
       <button class="hearBtn" id="partBTestHear">🔊 Hear sentence</button>
       <div class="tiny listenStatus" id="partBTestListenStatus">Tap Hear sentence. It will be read twice.</div>
-      <div class="paperWriteCue"><span>✏️</span><div><b>Write the whole sentence on paper</b><small>Check nothing yet — this is the test.</small></div></div>
-      <div class="btnrow" style="justify-content:center"><button class="primary bigDone" id="partBTestDone">Done ✅</button></div>
-      <div class="feedback" id="partBTestDoneFeedback"></div>
-      <div class="btnrow"><button class="secondary homeBtn">Quit test</button></div>
-    </div>
-  </section>
 
-  <section id="partBMark" class="view">
-    <div class="card">
-      <span class="badge">Parent marking • school rules</span>
-      <h3>✅ Check Aaron’s paper</h3>
-      <p class="sub">Compare his handwriting with the exact sentence. Count <b>word/spelling mistakes −3</b> and <b>capital/punctuation mistakes −1</b>.</p>
-      <div class="progressline"><div id="partBMarkProgress"></div></div>
-    </div>
-    <div class="card challenge" id="partBMarkCard">
-      <span class="badge" id="partBMarkBadge">Check sentence 1 of 8</span>
-      <div class="correctSentence" id="partBCorrectSentence"></div>
-      <div class="markingGrid">
-        <div class="markCounter">
-          <div><b>Word / spelling</b><small>−3 each</small></div>
-          <div class="counterControls"><button id="partBWordMinus">−</button><strong id="partBWordCount">0</strong><button id="partBWordPlus">+</button></div>
-        </div>
-        <div class="markCounter">
-          <div><b>Capital / punctuation</b><small>−1 each</small></div>
-          <div class="counterControls"><button id="partBPunctMinus">−</button><strong id="partBPunctCount">0</strong><button id="partBPunctPlus">+</button></div>
-        </div>
+      <div class="sentencePad">
+        <div class="sentencePadLabel">Aaron’s sentence</div>
+        <div class="sentenceBubbles" id="partBAnswerDisplay"><span class="sentencePlaceholder">Your sentence will appear here</span></div>
       </div>
-      <div class="sentenceDeduction" id="partBSentenceDeduction">Perfect sentence ✅</div>
-      <div class="btnrow" style="justify-content:center"><button class="primary" id="partBMarkNext">Next sentence ➜</button></div>
+
+      <div class="partBTools">
+        <button class="toolKey capsKey" id="partBCaps">abc ⇧</button>
+        <button class="toolKey" data-bpunct="’">’</button>
+        <button class="toolKey" data-bpunct=",">,</button>
+        <button class="toolKey" data-bpunct=".">.</button>
+        <button class="toolKey" data-bpunct="!">!</button>
+        <button class="toolKey quoteKey" data-bpunct="“">“</button>
+        <button class="toolKey quoteKey" data-bpunct="”">”</button>
+      </div>
+      <div class="alphabetPad partBAlphabet" id="partBAlphabet"></div>
+      <div class="partBEditRow">
+        <button class="ghost" id="partBBack">⌫ Letter</button>
+        <button class="nextWordBtn" id="partBNextWord">Next word ➜</button>
+        <button class="ghost" id="partBClear">Clear</button>
+      </div>
+      <div class="tiny touchHint">Tip: tap <b>abc ⇧</b> before a capital letter. Use <b>Next word ➜</b> instead of finding the space bar.</div>
+      <div class="btnrow" style="justify-content:center"><button class="primary bigDone" id="partBTestDone">Done ✅</button></div>
+      <div class="feedback" id="partBTestFeedback"></div>
+      <div class="btnrow"><button class="secondary homeBtn">Quit test</button></div>
     </div>
   </section>
 
@@ -436,6 +462,7 @@ button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(48,54,81,.12)}
       <div class="resultCount" id="partBPerfectCount">0/8 perfect sentences</div>
       <p class="sub" id="partBResultMsg"></p>
       <p class="tiny" id="partBErrorSummary"></p>
+      <p class="tiny">Automatic marking: word/spelling mistakes −3; capitalization and punctuation mistakes −1.</p>
       <p class="tiny">Saved automatically to Aaron’s Part B score history on this device.</p>
     </div>
     <div class="card">
@@ -631,7 +658,7 @@ try{
   }
 }catch(e){}
 
-let activeView="home", timers=[], vocab={i:0,selected:[],order:[],locked:false}, vocabTest={i:0,items:[],answer:"",results:[],locked:false}, partBTest={i:0,markI:0,marks:[],speaking:false}, builder={i:0,round:"chunks",selected:[],order:[]}, spell={i:0,selected:[],order:[]}, detective={i:0,locked:false}, boss={i:0};
+let activeView="home", timers=[], vocab={i:0,selected:[],order:[],locked:false}, vocabTest={i:0,items:[],answer:"",results:[],locked:false}, partBTest={i:0,answer:"",caps:false,results:[],speaking:false}, builder={i:0,round:"chunks",selected:[],order:[]}, spell={i:0,selected:[],order:[]}, detective={i:0,locked:false}, boss={i:0};
 
 function save(){
   try{localStorage.setItem("dictapetStateV2",JSON.stringify(state))}catch(e){}
@@ -1004,17 +1031,21 @@ $("builderCheck").onclick=()=>{
 };
 
 
-/* PART B TEST + GUIDED MARKING + HISTORY */
+/* PART B APP TEST + AUTOMATIC MARKING + HISTORY */
 function partBHistory(){return Array.isArray(state.partBTestHistory)?state.partBTestHistory:[]}
 function partBMeta(t){
-  const score=Number(t.score||0),perfect=Number(t.perfect||0),wordErrors=Number(t.wordErrors||0),punctErrors=Number(t.punctErrors||0);
-  return {score:score,pct:Math.round(score/60*100),perfect:perfect,wordErrors:wordErrors,punctErrors:punctErrors};
+  const score=Number(t.score||0),perfect=Number(t.perfect||0),wordErrors=Number(t.wordErrors||0);
+  const capitalErrors=Number(t.capitalErrors||0);
+  const punctOnly=Number(t.punctuationErrors||0);
+  const legacySmall=Number(t.punctErrors||0);
+  const smallErrors=(capitalErrors+punctOnly)||legacySmall;
+  return {score:score,pct:Math.round(score/60*100),perfect:perfect,wordErrors:wordErrors,capitalErrors:capitalErrors,punctuationErrors:punctOnly,smallErrors:smallErrors};
 }
 function renderPartBHistorySummary(){
   const box=$("partBHistorySummary");if(!box)return;
   const h=partBHistory();
   if(!h.length){
-    box.innerHTML='<div class="historyEmpty">No Part B test yet. Scores will appear here after parent marking.</div>';
+    box.innerHTML='<div class="historyEmpty">No Part B test yet. Aaron’s app-test scores will appear here automatically.</div>';
     return;
   }
   const latest=partBMeta(h[0]);
@@ -1038,7 +1069,7 @@ function showPartBHistory(){
 function renderPartBHistoryFull(){
   const h=partBHistory(),summary=$("partBHistoryTop"),list=$("partBHistoryList");
   if(!h.length){
-    summary.innerHTML='<b>No tests yet.</b> Finish a Part B test and parent marking first.';
+    summary.innerHTML='<b>No tests yet.</b> Complete a Part B Test and the result will be saved automatically.';
     list.innerHTML="";
     return;
   }
@@ -1047,21 +1078,38 @@ function renderPartBHistoryFull(){
   summary.innerHTML='<b>'+h.length+' test'+(h.length===1?'':'s')+'</b> • Best '+best+'/60 • Overall average '+avg+'/60';
   list.innerHTML=h.map(function(t){
     const m=partBMeta(t);
-    const details=(t.marks||[]).map(function(mark,n){
-      const deduction=(mark.wordErrors||0)*3+(mark.punctErrors||0);
-      return '<div class="bHistorySentence '+(deduction===0?'perfect':'review')+'">'+
-        '<span class="historyAnswerNum">'+(n+1)+'</span>'+
-        '<div><b>'+SENTENCES[n].text+'</b><small>'+(deduction===0?'Perfect sentence':(mark.wordErrors||0)+' word/spelling • '+(mark.punctErrors||0)+' capital/punctuation')+'</small></div>'+
-        '<strong>'+(deduction===0?'✅':'−'+deduction)+'</strong>'+
-      '</div>';
-    }).join("");
+    let details="";
+    if(Array.isArray(t.results)&&t.results.length){
+      details=t.results.map(function(r,n){
+        const deduction=(r.wordErrors||0)*3+(r.capitalErrors||0)+(r.punctuationErrors||0);
+        return '<div class="bHistoryAnswer '+(deduction===0?'perfect':'review')+'">'+
+          '<div class="bHistoryTop"><span class="historyAnswerNum">'+(n+1)+'</span><strong>'+(deduction===0?'✅':'−'+deduction)+'</strong></div>'+
+          '<div class="compareLine"><small>Aaron</small><b>'+(r.answer||'—')+'</b></div>'+
+          '<div class="compareLine correctLine"><small>Correct</small><b>'+SENTENCES[n].text+'</b></div>'+
+          '<div class="errorTags">'+
+            ((r.wordErrors||0)?'<span>Word/spelling ×'+r.wordErrors+'</span>':'')+
+            ((r.capitalErrors||0)?'<span>Capital ×'+r.capitalErrors+'</span>':'')+
+            ((r.punctuationErrors||0)?'<span>Punctuation ×'+r.punctuationErrors+'</span>':'')+
+          '</div>'+
+        '</div>';
+      }).join("");
+    }else{
+      details=(t.marks||[]).map(function(mark,n){
+        const deduction=(mark.wordErrors||0)*3+(mark.punctErrors||0);
+        return '<div class="bHistorySentence '+(deduction===0?'perfect':'review')+'">'+
+          '<span class="historyAnswerNum">'+(n+1)+'</span>'+
+          '<div><b>'+SENTENCES[n].text+'</b><small>'+(deduction===0?'Perfect sentence':(mark.wordErrors||0)+' word/spelling • '+(mark.punctErrors||0)+' capital/punctuation')+'</small></div>'+
+          '<strong>'+(deduction===0?'✅':'−'+deduction)+'</strong>'+
+        '</div>';
+      }).join("");
+    }
     return '<div class="historyEntry">'+
       '<div class="historyRow">'+
         '<div class="historyScore '+(m.score>=54?'great':m.score>=42?'ok':'needs')+'">'+m.score+'<span>/60</span></div>'+
         '<div class="historyDetails"><b>'+formatTestDate(t.ts)+'</b><small>'+m.perfect+'/8 perfect sentences</small>'+
-        '<div class="missedWords">'+m.wordErrors+' word/spelling error'+(m.wordErrors===1?'':'s')+' • '+m.punctErrors+' capital/punctuation error'+(m.punctErrors===1?'':'s')+'</div></div>'+
+        '<div class="missedWords">'+m.wordErrors+' word/spelling • '+m.smallErrors+' capital/punctuation</div></div>'+
       '</div>'+
-      '<details class="historyAnswers"><summary>See sentence-by-sentence marking</summary><div class="historyAnswerList">'+details+'</div></details>'+
+      '<details class="historyAnswers"><summary>See Aaron’s answers and correct answers</summary><div class="historyAnswerList">'+details+'</div></details>'+
     '</div>';
   }).join("");
 }
@@ -1078,7 +1126,7 @@ function speakPartBSentence(){
   if(partBTest.speaking)return;
   const status=$("partBTestListenStatus");
   if(!("speechSynthesis" in window)){
-    status.textContent="Audio is unavailable. A parent can read the sentence aloud.";
+    status.textContent="Audio is unavailable on this browser.";
     return;
   }
   partBTest.speaking=true;
@@ -1094,8 +1142,8 @@ function speakPartBSentence(){
       intro.onend=function(){setTimeout(function(){window.speechSynthesis.speak(line)},220)};
       line.onend=function(){
         pass++;
-        if(pass<2)setTimeout(speakPass,700);
-        else{partBTest.speaking=false;status.textContent="Now write the sentence on paper. Tap Hear again if needed."}
+        if(pass<2)setTimeout(speakPass,650);
+        else{partBTest.speaking=false;status.textContent="Now build the sentence. Tap Hear again if needed."}
       };
       line.onerror=function(){partBTest.speaking=false;status.textContent="Tap Hear again to try once more."};
       window.speechSynthesis.speak(intro);
@@ -1106,67 +1154,128 @@ function speakPartBSentence(){
     status.textContent="Tap Hear again to try once more.";
   }
 }
+function normalizeApostrophes(s){return String(s||"").replace(/'/g,"’")}
+function lexicalTokens(s){
+  const m=normalizeApostrophes(s).match(/[A-Za-z]+(?:’[A-Za-z]+)*/g)||[];
+  return m.map(function(raw){return {raw:raw,letters:raw.replace(/’/g,""),lower:raw.replace(/’/g,"").toLowerCase()}});
+}
+function punctuationSeq(s){
+  const n=normalizeApostrophes(s);
+  return Array.from(n).filter(function(ch){return !/[A-Za-z0-9\s]/.test(ch)}).join("");
+}
+function editDistance(a,b){
+  const A=Array.isArray(a)?a:Array.from(a),B=Array.isArray(b)?b:Array.from(b);
+  const d=Array.from({length:A.length+1},function(){return Array(B.length+1).fill(0)});
+  for(let i=0;i<=A.length;i++)d[i][0]=i;
+  for(let j=0;j<=B.length;j++)d[0][j]=j;
+  for(let i=1;i<=A.length;i++)for(let j=1;j<=B.length;j++){
+    const av=typeof A[i-1]==="object"?A[i-1].lower:A[i-1];
+    const bv=typeof B[j-1]==="object"?B[j-1].lower:B[j-1];
+    d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(av===bv?0:1));
+  }
+  return d;
+}
+function scorePartBSentence(answer,expected){
+  const A=lexicalTokens(answer),B=lexicalTokens(expected);
+  const d=editDistance(A,B);
+  let i=A.length,j=B.length,wordErrors=0,capitalErrors=0;
+  while(i>0||j>0){
+    if(i>0&&j>0&&A[i-1].lower===B[j-1].lower&&d[i][j]===d[i-1][j-1]){
+      if(A[i-1].letters!==B[j-1].letters)capitalErrors++;
+      i--;j--;continue;
+    }
+    if(i>0&&j>0&&d[i][j]===d[i-1][j-1]+1){wordErrors++;i--;j--;continue}
+    if(i>0&&d[i][j]===d[i-1][j]+1){wordErrors++;i--;continue}
+    if(j>0&&d[i][j]===d[i][j-1]+1){wordErrors++;j--;continue}
+    if(i>0&&j>0){wordErrors++;i--;j--}else if(i>0){wordErrors++;i--}else{wordErrors++;j--}
+  }
+  const pA=punctuationSeq(answer),pB=punctuationSeq(expected);
+  const punctuationErrors=editDistance(pA,pB)[pA.length][pB.length];
+  const deduction=wordErrors*3+capitalErrors+punctuationErrors;
+  return {wordErrors:wordErrors,capitalErrors:capitalErrors,punctuationErrors:punctuationErrors,deduction:deduction,perfect:deduction===0};
+}
 function startPartBTest(){
   stopPartBSpeech();
-  partBTest={i:0,markI:0,marks:[],speaking:false};
+  partBTest={i:0,answer:"",caps:false,results:[],speaking:false};
   showView("partBTest");
   later(loadPartBTestSentence,250);
 }
 function loadPartBTestSentence(){
   stopPartBSpeech();
+  partBTest.answer="";partBTest.caps=false;
   $("partBTestBadge").textContent="Sentence "+(partBTest.i+1)+" of 8";
   $("partBTestProgress").style.width=((partBTest.i/8)*100)+"%";
   $("partBTestListenStatus").textContent="Tap Hear sentence. It will be read twice.";
-  $("partBTestDoneFeedback").className="feedback";
+  $("partBTestFeedback").className="feedback";
+  renderPartBPad();
+}
+function renderPartBPad(){
+  const display=$("partBAnswerDisplay");
+  const text=partBTest.answer;
+  if(!text){
+    display.innerHTML='<span class="sentencePlaceholder">Your sentence will appear here</span>';
+  }else{
+    const trailing=/\s$/.test(text);
+    const words=text.trimEnd().split(/\s+/);
+    display.innerHTML=words.map(function(w,n){
+      return '<span class="sentenceBubble '+(!trailing&&n===words.length-1?'current':'')+'">'+w+'</span>';
+    }).join("")+(trailing?'<span class="sentenceBubble current emptyBubble">…</span>':'');
+  }
+  $("partBCaps").classList.toggle("on",partBTest.caps);
+  $("partBCaps").textContent=partBTest.caps?"ABC ⇧ ON":"abc ⇧";
+}
+function addPartBChar(ch){
+  if(partBTest.answer.length>=180)return;
+  let out=ch;
+  if(/[a-z]/.test(ch)&&partBTest.caps){out=ch.toUpperCase();partBTest.caps=false}
+  partBTest.answer+=out;
+  renderPartBPad();
+}
+function renderPartBKeyboard(){
+  const pad=$("partBAlphabet");pad.innerHTML="";
+  "abcdefghijklmnopqrstuvwxyz".split("").forEach(function(ch){
+    const b=document.createElement("button");b.className="alphaKey";b.textContent=ch;
+    b.onclick=function(){addPartBChar(ch)};
+    pad.appendChild(b);
+  });
 }
 $("partBTestHear").onclick=function(){speakPartBSentence()};
+$("partBCaps").onclick=function(){partBTest.caps=!partBTest.caps;renderPartBPad()};
+$("partBBack").onclick=function(){partBTest.answer=partBTest.answer.slice(0,-1);renderPartBPad()};
+$("partBClear").onclick=function(){partBTest.answer="";partBTest.caps=false;renderPartBPad()};
+$("partBNextWord").onclick=function(){
+  if(!partBTest.answer||/\s$/.test(partBTest.answer))return;
+  partBTest.answer+=" ";renderPartBPad();
+};
+document.querySelectorAll("[data-bpunct]").forEach(function(b){
+  b.onclick=function(){addPartBChar(b.dataset.bpunct)};
+});
 $("partBTestDone").onclick=function(){
-  if(partBTest.speaking)stopPartBSpeech();
-  const f=$("partBTestDoneFeedback");
+  const answer=partBTest.answer.trim().replace(/\s+/g," ");
+  if(!answer){
+    const f=$("partBTestFeedback");f.className="feedback try show";f.innerHTML="<b>Build the sentence first.</b>";
+    return;
+  }
+  stopPartBSpeech();
+  const expected=SENTENCES[partBTest.i].text;
+  const scored=scorePartBSentence(answer,expected);
+  partBTest.results.push({answer:answer,wordErrors:scored.wordErrors,capitalErrors:scored.capitalErrors,punctuationErrors:scored.punctuationErrors,deduction:scored.deduction,perfect:scored.perfect});
+  const f=$("partBTestFeedback");
   f.className="feedback good show";f.innerHTML="<b>Done ✓</b> Next sentence…";
   later(function(){
     partBTest.i++;
-    if(partBTest.i>=8)startPartBMarking();
+    if(partBTest.i>=8)finishPartBAppTest();
     else animateSwap("partBTestCard",loadPartBTestSentence);
   },520);
 };
-function startPartBMarking(){
-  stopPartBSpeech();
-  partBTest.markI=0;
-  partBTest.marks=Array.from({length:8},function(){return {wordErrors:0,punctErrors:0}});
-  showView("partBMark");
-  later(loadPartBMarkSentence,250);
-}
-function currentBMark(){return partBTest.marks[partBTest.markI]}
-function renderPartBMarkCounters(){
-  const m=currentBMark();
-  $("partBWordCount").textContent=m.wordErrors;
-  $("partBPunctCount").textContent=m.punctErrors;
-  const deduction=m.wordErrors*3+m.punctErrors;
-  $("partBSentenceDeduction").textContent=deduction===0?"Perfect sentence ✅":"Current deduction: −"+deduction;
-}
-function loadPartBMarkSentence(){
-  const m=currentBMark();
-  $("partBMarkBadge").textContent="Check sentence "+(partBTest.markI+1)+" of 8";
-  $("partBMarkProgress").style.width=((partBTest.markI/8)*100)+"%";
-  $("partBCorrectSentence").textContent=SENTENCES[partBTest.markI].text;
-  renderPartBMarkCounters();
-  $("partBMarkNext").textContent=partBTest.markI===7?"Finish marking ✅":"Next sentence ➜";
-}
-$("partBWordMinus").onclick=function(){const m=currentBMark();m.wordErrors=Math.max(0,m.wordErrors-1);renderPartBMarkCounters()};
-$("partBWordPlus").onclick=function(){const m=currentBMark();m.wordErrors++;renderPartBMarkCounters()};
-$("partBPunctMinus").onclick=function(){const m=currentBMark();m.punctErrors=Math.max(0,m.punctErrors-1);renderPartBMarkCounters()};
-$("partBPunctPlus").onclick=function(){const m=currentBMark();m.punctErrors++;renderPartBMarkCounters()};
-$("partBMarkNext").onclick=function(){
-  if(partBTest.markI>=7)finishPartBTest();
-  else{partBTest.markI++;animateSwap("partBMarkCard",loadPartBMarkSentence)}
-};
-function finishPartBTest(){
-  const wordErrors=partBTest.marks.reduce(function(s,m){return s+m.wordErrors},0);
-  const punctErrors=partBTest.marks.reduce(function(s,m){return s+m.punctErrors},0);
-  const perfect=partBTest.marks.filter(function(m){return m.wordErrors===0&&m.punctErrors===0}).length;
-  const score=Math.max(0,60-wordErrors*3-punctErrors);
-  const record={ts:Date.now(),score:score,perfect:perfect,wordErrors:wordErrors,punctErrors:punctErrors,marks:partBTest.marks.map(function(m){return {wordErrors:m.wordErrors,punctErrors:m.punctErrors}})};
+function finishPartBAppTest(){
+  const wordErrors=partBTest.results.reduce(function(s,r){return s+r.wordErrors},0);
+  const capitalErrors=partBTest.results.reduce(function(s,r){return s+r.capitalErrors},0);
+  const punctuationErrors=partBTest.results.reduce(function(s,r){return s+r.punctuationErrors},0);
+  const perfect=partBTest.results.filter(function(r){return r.perfect}).length;
+  const totalDeduction=wordErrors*3+capitalErrors+punctuationErrors;
+  const score=Math.max(0,60-totalDeduction);
+  const record={ts:Date.now(),mode:"app",score:score,perfect:perfect,wordErrors:wordErrors,capitalErrors:capitalErrors,punctuationErrors:punctuationErrors,punctErrors:capitalErrors+punctuationErrors,results:partBTest.results.map(function(r){return {answer:r.answer,wordErrors:r.wordErrors,capitalErrors:r.capitalErrors,punctuationErrors:r.punctuationErrors,deduction:r.deduction,perfect:r.perfect}})};
   if(!Array.isArray(state.partBTestHistory))state.partBTestHistory=[];
   state.partBTestHistory.unshift(record);
   if(state.partBTestHistory.length>100)state.partBTestHistory=state.partBTestHistory.slice(0,100);
@@ -1175,20 +1284,26 @@ function finishPartBTest(){
   save();
   $("partBResultScore").textContent=score+"/60";
   $("partBPerfectCount").textContent=perfect+"/8 perfect sentences";
-  $("partBErrorSummary").textContent=wordErrors+" word/spelling error"+(wordErrors===1?"":"s")+" • "+punctErrors+" capital/punctuation error"+(punctErrors===1?"":"s");
-  $("partBResultMsg").textContent=score===60?"Perfect Part B dictation! 🏆":score>=54?"Excellent — very close to perfect. 🌟":score>=48?"Strong result — review the marked sentences. 💪":"Review the sentences with deductions, then practise again. 📚";
-  $("partBResultList").innerHTML=partBTest.marks.map(function(m,n){
-    const deduction=m.wordErrors*3+m.punctErrors;
-    return '<div class="testResultRow '+(deduction===0?'correct':'wrong')+'"><span>'+(deduction===0?'✅':'✏️')+'</span>'+
-      '<div><b>Sentence '+(n+1)+'</b><small>'+SENTENCES[n].text+'</small>'+
-      (deduction===0?'':'<small>'+m.wordErrors+' word/spelling • '+m.punctErrors+' capital/punctuation</small>')+'</div>'+
-      '<strong>'+(deduction===0?'Perfect':'−'+deduction)+'</strong></div>';
+  $("partBErrorSummary").textContent=wordErrors+" word/spelling • "+capitalErrors+" capital • "+punctuationErrors+" punctuation";
+  $("partBResultMsg").textContent=score===60?"Perfect Part B dictation! 🏆":score>=54?"Excellent — very close to perfect. 🌟":score>=48?"Strong result — review the highlighted sentences. 💪":"Review the sentences with deductions, then practise again. 📚";
+  $("partBResultList").innerHTML=partBTest.results.map(function(r,n){
+    return '<div class="bResultCompare '+(r.perfect?'correct':'wrong')+'">'+
+      '<div class="bResultHead"><b>Sentence '+(n+1)+'</b><strong>'+(r.perfect?'✅ Perfect':'−'+r.deduction)+'</strong></div>'+
+      '<div class="compareLine"><small>Aaron’s answer</small><b>'+(r.answer||'—')+'</b></div>'+
+      '<div class="compareLine correctLine"><small>Correct answer</small><b>'+SENTENCES[n].text+'</b></div>'+
+      '<div class="errorTags">'+
+        (r.wordErrors?'<span>Word/spelling ×'+r.wordErrors+'</span>':'')+
+        (r.capitalErrors?'<span>Capital ×'+r.capitalErrors+'</span>':'')+
+        (r.punctuationErrors?'<span>Punctuation ×'+r.punctuationErrors+'</span>':'')+
+      '</div>'+
+    '</div>';
   }).join("");
   showView("partBResult");
   later(function(){celebrate("partBResultPet",Math.max(1,perfect),score===60)},300);
 }
 $("partBTestAgain").onclick=function(){startPartBTest()};
 $("partBResultHistory").onclick=function(){showPartBHistory()};
+renderPartBKeyboard();
 
 function startSpell(){spell={i:0,selected:[],order:[]};showView("spell");later(loadSpell,250)}
 function loadSpell(){

@@ -564,98 +564,86 @@ function renderPartBHistoryFull(){
     '</div>';
   }).join("");
 }
-function partBSpokenText(i){
-  if(i===4)return "Open quotation mark. Oh, no! Close quotation mark. says Joe.";
-  if(i===5)return "Open quotation mark. I'm in the wrong class. Close quotation mark.";
-  return SENTENCES[i].text;
+function partBDictationScript(i){
+  return [
+    "It's Joe's first day at his new school, full stop.",
+    "It's ten o'clock and the pupils are in the music room, full stop.",
+    "They're playing the recorder, full stop.",
+    "Joe thinks it is difficult to repeat after the teacher, full stop.",
+    "Open quotation mark, Oh, comma, no, exclamation mark, close quotation mark, says Joe, full stop.",
+    "Open quotation mark, I'm in the wrong class, full stop, close quotation mark.",
+    "Joe and the other pupils laugh, full stop.",
+    "Joe goes to his classroom, full stop."
+  ][i]||"";
+}
+function partBFullVoiceText(i){
+  const s=partBDictationScript(i);
+  return "Sentence "+(i+1)+". "+s+" Again. "+s;
 }
 function stopPartBSpeech(){
   try{if("speechSynthesis" in window)window.speechSynthesis.cancel()}catch(e){}
+  try{if(window.DictaPetAI)window.DictaPetAI.stop()}catch(e){}
   partBTest.speaking=false;
 }
-function partBNaturalChunks(i){
-  if(i===0)return ["It’s Joe’s first day","at his new school."];
-  if(i===1)return ["It’s ten o’clock","and the pupils are","in the music room."];
-  if(i===2)return ["They’re playing","the recorder."];
-  if(i===3)return ["Joe thinks it is difficult","to repeat","after the teacher."];
-  if(i===4)return ["Oh, no!","says Joe."];
-  if(i===5)return ["I’m in the wrong class."];
-  if(i===6)return ["Joe and the other pupils","laugh."];
-  return ["Joe goes","to his classroom."];
-}
-function partBPunctuationChunks(i){
-  if(i===0)return ["It’s Joe’s first day at his new school","full stop","apostrophe in It’s","apostrophe in Joe’s"];
-  if(i===1)return ["It’s ten o’clock and the pupils are in the music room","full stop","apostrophe in It’s","apostrophe in o’clock"];
-  if(i===2)return ["They’re playing the recorder","full stop","apostrophe in They’re"];
-  if(i===3)return ["Joe thinks it is difficult to repeat after the teacher","full stop"];
-  if(i===4)return ["open quotation mark","Oh","comma","no","exclamation mark","close quotation mark","says Joe","full stop"];
-  if(i===5)return ["open quotation mark","I’m in the wrong class","full stop","close quotation mark","apostrophe in I’m"];
-  if(i===6)return ["Joe and the other pupils laugh","full stop"];
-  return ["Joe goes to his classroom","full stop"];
-}
-function speakUtteranceSequence(parts,rate,gap,onStatus,onDone){
-  let k=0;
-  function next(){
-    if(k>=parts.length){if(onDone)onDone();return}
-    const u=makeClearUtterance(parts[k],rate);
-    u.onstart=function(){if(onStatus)onStatus(k,parts.length)};
-    u.onend=function(){k++;setTimeout(next,gap)};
-    u.onerror=function(){partBTest.speaking=false;if(onDone)onDone(true)};
-    window.speechSynthesis.speak(u);
-  }
-  next();
-}
-function speakPartBSentence(slowMode){
-  if(partBTest.speaking)return;
+function speakPartBFallback(slowMode){
   const status=$("partBTestListenStatus");
   if(!("speechSynthesis" in window)){
+    partBTest.speaking=false;
     status.textContent="Audio is unavailable on this browser.";
     return;
   }
-  partBTest.speaking=true;
   try{
     window.speechSynthesis.cancel();
+    const script=partBDictationScript(partBTest.i);
     let pass=0;
-    function runPass(){
-      const punctuationPass=pass===1;
-      const label=punctuationPass?"Second reading • punctuation":"First reading • natural";
-      const introText=pass===0?"Sentence "+(partBTest.i+1)+".":"Again, with punctuation.";
-      const intro=makeClearUtterance(introText,.72);
-      intro.onstart=function(){status.textContent=label+"… 🔊"};
+    function run(){
+      const intro=makeClearUtterance(pass===0?"Sentence "+(partBTest.i+1)+".":"Again.",slowMode?.58:.70);
       intro.onend=function(){
         setTimeout(function(){
-          const chunks=punctuationPass?partBPunctuationChunks(partBTest.i):partBNaturalChunks(partBTest.i);
-          speakUtteranceSequence(
-            chunks,
-            slowMode?.52:(punctuationPass?.56:.64),
-            slowMode?560:(punctuationPass?480:360),
-            function(k,total){
-              status.textContent=label+" • part "+(k+1)+" of "+total+" 🔊";
-            },
-            function(failed){
-              if(failed){
-                partBTest.speaking=false;
-                status.textContent="Tap Hear again to try once more.";
-                return;
-              }
-              pass++;
-              if(pass<2)setTimeout(runPass,900);
-              else{
-                partBTest.speaking=false;
-                status.textContent="Now build the sentence. The second reading included the punctuation.";
-              }
-            }
-          );
-        },300);
+          const line=makeClearUtterance(script,slowMode?.50:.61);
+          line.onstart=function(){status.textContent=(pass===0?"First reading":"Second reading")+"… 🔊"};
+          line.onend=function(){
+            pass++;
+            if(pass<2)setTimeout(run,700);
+            else{partBTest.speaking=false;status.textContent="Now build the sentence. Punctuation was spoken inline."}
+          };
+          line.onerror=function(){partBTest.speaking=false;status.textContent="Tap Hear sentence to try again."};
+          window.speechSynthesis.speak(line);
+        },220);
       };
-      intro.onerror=function(){partBTest.speaking=false;status.textContent="Tap Hear again to try once more."};
+      intro.onerror=function(){partBTest.speaking=false;status.textContent="Tap Hear sentence to try again."};
       window.speechSynthesis.speak(intro);
     }
-    runPass();
+    run();
   }catch(e){
     partBTest.speaking=false;
-    status.textContent="Tap Hear again to try once more.";
+    status.textContent="Tap Hear sentence to try again.";
   }
+}
+async function speakPartBSentence(slowMode){
+  if(partBTest.speaking)return;
+  const status=$("partBTestListenStatus");
+  partBTest.speaking=true;
+  const idx=partBTest.i;
+  if(window.DictaPetAI&&typeof window.DictaPetAI.play==="function"){
+    try{
+      await window.DictaPetAI.play({
+        key:"partb-"+(idx+1)+"-"+(slowMode?"slow":"normal")+"-teacher-v2",
+        text:partBFullVoiceText(idx),
+        speed:slowMode?0.78:0.92,
+        onStatus:function(msg){status.textContent=msg}
+      });
+      partBTest.speaking=false;
+      status.textContent="Now build the sentence. Punctuation was spoken inline.";
+      return;
+    }catch(e){
+      console.warn("Free AI voice unavailable; falling back to the built-in voice.",e);
+      partBTest.speaking=false;
+      status.textContent="AI voice unavailable here — using the built-in voice.";
+    }
+  }
+  partBTest.speaking=true;
+  speakPartBFallback(slowMode);
 }
 function normalizeApostrophes(s){return String(s||"").replace(/'/g,"’")}
 function lexicalTokens(s){
@@ -708,7 +696,7 @@ function loadPartBTestSentence(){
   partBTest.answer="";partBTest.caps=false;
   $("partBTestBadge").textContent="Sentence "+(partBTest.i+1)+" of 8";
   $("partBTestProgress").style.width=((partBTest.i/8)*100)+"%";
-  $("partBTestListenStatus").textContent="First reading is natural. Second reading says the punctuation aloud.";
+  $("partBTestListenStatus").textContent="The same teacher-style script is read twice, with punctuation spoken inline.";
   $("partBTestFeedback").className="feedback";
   renderPartBPad();
 }

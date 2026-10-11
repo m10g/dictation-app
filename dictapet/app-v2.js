@@ -184,11 +184,26 @@ function renderVocabHistoryFull(){
   summary.innerHTML='<b>'+h.length+' test'+(h.length===1?'':'s')+'</b> • Best '+best+'% • Overall average '+avg+'%';
   list.innerHTML=h.map(function(t){
     const m=testMeta(t);
-    const missed=(t.results||[]).filter(function(r){return !r.correct}).map(function(r){return r.word});
-    return '<div class="historyRow">'+
-      '<div class="historyScore '+(m.pct>=90?'great':m.pct>=70?'ok':'needs')+'">'+m.score+'<span>/'+m.maxScore+'</span></div>'+
-      '<div class="historyDetails"><b>'+formatTestDate(t.ts)+'</b><small>'+t.correctCount+'/'+m.total+' exact • '+m.pct+'%</small>'+
-      '<div class="missedWords">'+(missed.length?'Review: '+missed.join(', '):'Perfect — no words missed 🎉')+'</div></div></div>';
+    const results=t.results||[];
+    const missed=results.filter(function(r){return !r.correct}).map(function(r){return r.word});
+    const answers=results.map(function(r,n){
+      return '<div class="historyAnswerRow '+(r.correct?'correct':'wrong')+'">'+
+        '<span class="historyAnswerNum">'+(n+1)+'</span>'+
+        '<div><small>Aaron’s answer</small><b>'+(r.answer||'—')+'</b></div>'+
+        '<div><small>Correct answer</small><b>'+r.word+'</b></div>'+
+        '<span class="historyAnswerMark">'+(r.correct?'✅':'❌')+'</span>'+
+      '</div>';
+    }).join("");
+    return '<div class="historyEntry">'+
+      '<div class="historyRow">'+
+        '<div class="historyScore '+(m.pct>=90?'great':m.pct>=70?'ok':'needs')+'">'+m.score+'<span>/'+m.maxScore+'</span></div>'+
+        '<div class="historyDetails"><b>'+formatTestDate(t.ts)+'</b><small>'+t.correctCount+'/'+m.total+' exact • '+m.pct+'%</small>'+
+        '<div class="missedWords">'+(missed.length?'Review: '+missed.join(', '):'Perfect — no words missed 🎉')+'</div></div>'+
+      '</div>'+
+      '<details class="historyAnswers"><summary>See Aaron’s answers and correct answers</summary>'+
+        '<div class="historyAnswerList">'+(answers||'<div class="historyEmpty">Answer details were not saved for this older test.</div>')+'</div>'+
+      '</details>'+
+    '</div>';
   }).join("");
 }
 function speakVocabTestWord(){
